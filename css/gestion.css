@@ -338,3 +338,8 @@ body:has(.barre-enregistrer:not([hidden])) .toast{bottom:84px}
 @media (max-width:1100px){ .tuiles.t5{grid-template-columns:repeat(3,1fr)} }
 @media (max-width:620px){ .tuiles.t5{grid-template-columns:1fr 1fr} .choix-image{grid-template-columns:90px 1fr} .choix-image .apercu-img{width:90px} }
 .liste-evt li > div:first-child{flex:1;display:grid}
+#fre{display:grid;gap:14px}
+.captures-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.captures-g figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.captures-g img{width:100%;height:90px;object-fit:cover;display:block}.captures-g figure div{display:flex;justify-content:space-between;padding:2px}
+.captures-g .btn-icone{width:30px;height:30px}

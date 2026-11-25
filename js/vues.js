@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611251924';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611251924';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, TYPES_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611251924';
-import { SITE_URL } from '../firebase-config.js?v=202611251924';
+import * as S from './store.js?v=202611252005';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252005';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252005';
+import { SITE_URL } from '../firebase-config.js?v=202611252005';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -77,7 +77,7 @@ export const VUES = {
   tableau: {
     titre: 'Tableau de bord', icone: 'tableau',
     rendre(el) {
-      const livres = S.liste('livres'), photos = S.liste('photos'), projets = S.liste('projets'), cosplays = S.liste('cosplays');
+      const livres = S.liste('livres'), photos = S.liste('photos'), projets = S.liste('realisations'), cosplays = S.liste('cosplays');
       const imagesPerso = IMAGES_SITE.filter(i => S.image(i.cle)).length;
       el.innerHTML = `
         ${S.mode === 'firebase' && S.chargementTermine() && S.baseVide() ? `
@@ -88,7 +88,7 @@ export const VUES = {
         <div class="tuiles t5">
           <a class="tuile" href="#livres"><span>${ic('livre')}</span><b>${visibles(livres)}</b><small>Livres en ligne</small></a>
           <a class="tuile" href="#photos"><span>${ic('photos')}</span><b>${visibles(photos)}</b><small>Photos en ligne</small></a>
-          <a class="tuile" href="#projets"><span>${ic('projet')}</span><b>${visibles(projets)}</b><small>Projets en ligne</small></a>
+          <a class="tuile" href="#realisations"><span>${ic('projet')}</span><b>${visibles(projets)}</b><small>Projets en ligne</small></a>
           <a class="tuile" href="#cosplays"><span>${ic('cosplay')}</span><b>${visibles(cosplays)}</b><small>Cosplays en ligne</small></a>
           <a class="tuile" href="#images"><span>${ic('image')}</span><b>${imagesPerso}<small style="font-size:.9rem"> / ${IMAGES_SITE.length}</small></b><small>Images personnalisées</small></a>
         </div>
@@ -164,21 +164,56 @@ export const VUES = {
     }
   },
 
-  // -------------------------------------------------------------- Projets
-  projets: {
+  // -------------------------------------------------------------- Projets numériques
+  realisations: {
     titre: 'Projets numériques', icone: 'projet',
+    filtre: 'tout',
     rendre(el) {
-      const l = S.liste('projets');
+      const cats = S.liste('projets'), toutes = S.liste('realisations');
+      if (this.filtre !== 'tout' && !cats.some(c => c.id === this.filtre)) this.filtre = 'tout';
+      const l = this.filtre === 'tout' ? toutes : toutes.filter(r => r.categorie === this.filtre);
+      const nomCat = id => cats.find(c => c.id === id)?.titre || 'Sans catégorie';
       el.innerHTML = `
-        <div class="barre"><p class="intro">Sites, applications, jeux… L'ordre ici est celui de la page Projets.</p><button class="btn btn-primaire" id="ajout">${ic('plus')} Nouveau projet</button></div>
+        <div class="barre">
+          <div class="filtres">${[['tout', 'Tous'], ...cats.map(c => [c.id, c.titre])].map(([k, v]) => `<button class="${k === this.filtre ? 'on' : ''}" data-f="${esc(k)}">${esc(v)} <span>${k === 'tout' ? toutes.length : toutes.filter(r => r.categorie === k).length}</span></button>`).join('')}</div>
+          <button class="btn btn-primaire" id="ajout" ${cats.length ? '' : 'disabled'}>${ic('plus')} Nouveau projet</button>
+        </div>
+        <p class="intro">Chaque projet a sa page sur le site, dans sa catégorie. L'ordre se règle dans une catégorie (filtre).${cats.length ? '' : ' Créez d\'abord une catégorie.'}</p>
         ${l.length ? `<div class="galerie">${l.map((x, i) => `
           <figure class="photo ${x.visible === false ? 'masque' : ''}">
             <div class="photo-img">${x.image ? `<img src="${esc(x.image)}" alt="" loading="lazy">` : `<div class="vide-img">${esc(x.titre)}</div>`}${etiquetteMasque(x)}</div>
-            <figcaption><b>${esc(x.titre)}</b><small class="type">${esc(TYPES_PROJET[x.type] || '')}</small></figcaption>
+            <figcaption><b>${esc(x.titre)}</b><small class="type">${esc(nomCat(x.categorie))}${STATUTS_PROJET[x.statut] ? ' · ' + esc(STATUTS_PROJET[x.statut]) : ''}</small></figcaption>
+            ${actions(x, i, l.length, this.filtre !== 'tout')}
+          </figure>`).join('')}</div>` : vide('Aucun projet ici', 'Ajoutez un site, une application ou un jeu.')}`;
+      $$('[data-f]', el).forEach(b => b.onclick = () => { this.filtre = b.dataset.f; this.rendre(el); });
+      $('#ajout', el).onclick = () => formRealisation(null, this.filtre === 'tout' ? cats[0]?.id : this.filtre);
+      // L'ordre se règle à l'intérieur d'une catégorie
+      $$('[data-haut]', el).forEach(b => b.onclick = () => deplacerDans(b.dataset.haut, -1, this.filtre));
+      $$('[data-bas]', el).forEach(b => b.onclick = () => deplacerDans(b.dataset.bas, 1, this.filtre));
+      brancherListe(el, 'realisations', { formulaire: formRealisation, nom: x => x.titre });
+    }
+  },
+
+  // -------------------------------------------------------------- Catégories de projets
+  categories: {
+    titre: 'Catégories de projets', icone: 'tableau',
+    rendre(el) {
+      const l = S.liste('projets'), reals = S.liste('realisations');
+      el.innerHTML = `
+        <div class="barre"><p class="intro">Les catégories s'affichent sur la page Projets du site (Sites web, Applications, Jeux…). Un clic sur une catégorie ouvre la liste de ses projets.</p><button class="btn btn-primaire" id="ajout">${ic('plus')} Nouvelle catégorie</button></div>
+        ${l.length ? `<div class="galerie">${l.map((x, i) => `
+          <figure class="photo ${x.visible === false ? 'masque' : ''}">
+            <div class="photo-img">${x.image ? `<img src="${esc(x.image)}" alt="" loading="lazy">` : `<div class="vide-img">${esc(x.titre)}</div>`}${etiquetteMasque(x)}</div>
+            <figcaption><b>${esc(x.titre)}</b><small class="type">${reals.filter(r => r.categorie === x.id).length} projet(s)</small></figcaption>
             ${actions(x, i, l.length)}
-          </figure>`).join('')}</div>` : vide('Aucun projet', 'Présentez vos sites, applications et jeux.')}`;
-      $('#ajout', el).onclick = () => formProjet();
-      brancherListe(el, 'projets', { formulaire: formProjet, nom: x => x.titre });
+          </figure>`).join('')}</div>` : vide('Aucune catégorie', 'Créez par exemple « Sites web », « Applications » et « Jeux ».')}`;
+      $('#ajout', el).onclick = () => formCategorie();
+      brancherListe(el, 'projets', { formulaire: formCategorie, nom: x => x.titre,
+        supprimer: async id => {
+          const n = reals.filter(r => r.categorie === id).length;
+          if (n) throw Object.assign(new Error(`Cette catégorie contient ${n} projet(s) : déplacez-les ou supprimez-les d'abord.`), { code: 'categorie-non-vide' });
+          return S.supprimer('projets', id);
+        } });
     }
   },
 
@@ -408,7 +443,7 @@ export const VUES = {
         <div class="grille-2">
           <section class="carte">
             <div class="carte-tete"><h3>Contenu d'origine du site</h3></div>
-            <p>Ajoute dans la base les textes, les liens, les livres, les photos et les projets du site tels qu'ils ont été créés. Ce qui existe déjà est conservé.</p>
+            <p>Ajoute dans la base les textes, les liens, les livres, les photos, les catégories et les projets du site tels qu'ils ont été créés. Ce qui existe déjà est conservé.</p>
             <button class="btn btn-sombre" id="importer">${ic('telecharger')} Importer ce qui manque</button>
             <button class="btn btn-clair danger" id="ecraser">Tout remettre comme à l'origine</button>
           </section>
@@ -501,24 +536,90 @@ function formLivre(l = null) {
   });
 }
 
-function formProjet(p = null) {
+function formCategorie(c = null) {
   formulaireAvecImage({
-    id: 'fpr', col: 'projets', element: p, titre: p ? 'Modifier le projet' : 'Nouveau projet',
-    defaut: { titre: '', type: 'site', description: '', technologies: '', lien: '', libelleLien: '', image: '', visible: true },
-    image: { cle: 'image', label: 'Image', largeur: 1000, plafond: 220000 },
+    id: 'fpr', col: 'projets', element: c, titre: c ? 'Modifier la catégorie' : 'Nouvelle catégorie',
+    defaut: { titre: '', description: '', image: '', visible: true },
+    image: { cle: 'image', label: 'Image de la carte', largeur: 1200, plafond: 240000 },
     corps: v => `
+      ${champ({ cle: 'titre', label: 'Nom de la catégorie', valeur: v.titre, requis: true, placeholder: 'Ex. : Jeux' })}
+      ${champ({ cle: 'description', label: 'Description courte', valeur: v.description })}
+      ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}`,
+    valider: d => !d.titre ? 'Le nom est obligatoire' : '',
+  });
+}
+
+// Déplace un projet parmi ceux de la même catégorie
+async function deplacerDans(id, sens, cat) {
+  const l = S.liste('realisations').filter(r => r.categorie === cat);
+  const i = l.findIndex(x => x.id === id), j = i + sens;
+  if (i < 0 || j < 0 || j >= l.length) return;
+  [l[i], l[j]] = [l[j], l[i]];
+  await S.lot(l.map((x, k) => ({ type: 'merge', col: 'realisations', id: x.id, data: { ordre: k + 1 } }))).catch(erreur);
+}
+
+function formRealisation(r = null, categorieDefaut = '') {
+  const cats = S.liste('projets');
+  const v = r || { titre: '', categorie: categorieDefaut || cats[0]?.id || '', statut: 'en-ligne', annee: String(new Date().getFullYear()), accroche: '', description: '', points: '', plateforme: '', technologies: '', lien: '', libelleLien: '', image: '', captures: [], visible: true };
+  const ci = champImage({ valeur: v.image, label: 'Image principale', largeur: 1400, plafond: 230000 });
+  let captures = [...(v.captures || [])];
+  const MAX = 6;
+  ouvrirFenetre({
+    titre: r ? 'Modifier le projet' : 'Nouveau projet', large: true,
+    contenu: `<form id="fre">
+      ${ci.html}
       <div class="grille-champs">
         ${champ({ cle: 'titre', label: 'Nom du projet', valeur: v.titre, requis: true })}
-        ${champ({ cle: 'type', label: 'Type', type: 'select', valeur: v.type, options: TYPES_PROJET })}
+        ${champ({ cle: 'categorie', label: 'Catégorie', type: 'select', valeur: v.categorie, options: Object.fromEntries(cats.map(c => [c.id, c.titre])) })}
       </div>
-      ${champ({ cle: 'description', label: 'Description', type: 'texte', valeur: v.description })}
-      ${champ({ cle: 'technologies', label: 'Technologies (séparées par des virgules)', valeur: v.technologies, placeholder: 'Ex. : HTML, Firebase, React Native' })}
+      ${champ({ cle: 'accroche', label: 'Accroche (une phrase)', valeur: v.accroche })}
+      ${champ({ cle: 'description', label: 'Description', type: 'texte', valeur: v.description, aide: 'Une ligne vide = nouveau paragraphe. *mot* = italique.' })}
+      ${champ({ cle: 'points', label: 'Points forts (un par ligne)', type: 'texte', valeur: v.points })}
       <div class="grille-champs">
+        ${champ({ cle: 'plateforme', label: 'Plateforme', valeur: v.plateforme, placeholder: 'Ex. : Site web, Android' })}
+        ${champ({ cle: 'technologies', label: 'Technologies', valeur: v.technologies, placeholder: 'Ex. : HTML, Firebase' })}
+        ${champ({ cle: 'statut', label: 'Statut', type: 'select', valeur: v.statut, options: STATUTS_PROJET })}
+        ${champ({ cle: 'annee', label: 'Année', valeur: v.annee })}
         ${champ({ cle: 'lien', label: 'Lien (facultatif)', valeur: v.lien, placeholder: 'https://…' })}
-        ${champ({ cle: 'libelleLien', label: 'Texte du lien', valeur: v.libelleLien, placeholder: 'Voir le projet' })}
+        ${champ({ cle: 'libelleLien', label: 'Texte du bouton', valeur: v.libelleLien, placeholder: 'Voir le site' })}
       </div>
-      ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}`,
-    valider: d => !d.titre ? 'Le nom est obligatoire' : !lienValide(d.lien) ? 'Le lien doit commencer par https://' : '',
+      <div class="champ"><label>Captures d'écran (${MAX} au maximum)</label><div class="captures-g" data-caps></div>
+        <label class="btn btn-clair" style="justify-self:start">${ic('televerser')} Ajouter des captures<input type="file" accept="image/*" multiple data-caps-fichiers hidden></label>
+        <span class="aide" data-caps-etat></span></div>
+      ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}
+    </form>`,
+    pied: piedForm('fre'),
+    onOuvert(corps, pied) {
+      ci.brancher(corps);
+      const zone = $('[data-caps]', corps), etat = $('[data-caps-etat]', corps);
+      const dessiner = () => {
+        zone.innerHTML = captures.map((src, i) => `<figure><img src="${esc(src)}" alt=""><div>
+          <button type="button" class="btn-icone" data-cg="${i}" ${i === 0 ? 'disabled' : ''} title="Avancer">${ic('haut')}</button>
+          <button type="button" class="btn-icone danger" data-cx="${i}" title="Retirer">${ic('supprimer')}</button></div></figure>`).join('') || '<p class="muet">Aucune capture.</p>';
+        $$('[data-cx]', zone).forEach(b => b.onclick = () => { captures.splice(+b.dataset.cx, 1); dessiner(); });
+        $$('[data-cg]', zone).forEach(b => b.onclick = () => { const i = +b.dataset.cg; [captures[i - 1], captures[i]] = [captures[i], captures[i - 1]]; dessiner(); });
+      };
+      dessiner();
+      $('[data-caps-fichiers]', corps).onchange = async e => {
+        const fichiers = [...e.target.files].slice(0, MAX - captures.length); e.target.value = '';
+        for (const f of fichiers) { etat.textContent = 'Préparation…'; try { captures.push(await preparerImage(f, 1200, 110000)); } catch (err) { etat.textContent = err.message; } }
+        etat.textContent = captures.length >= MAX ? 'Maximum atteint.' : ''; dessiner();
+      };
+      $('[data-annuler]', pied).onclick = fermerFenetre;
+      $('#fre', corps).onsubmit = async ev => {
+        ev.preventDefault();
+        const d = { ...lireFormulaire(ev.target), image: ci.lire(), captures };
+        if (!d.titre) return toast('Le nom est obligatoire', 'erreur');
+        if (!lienValide(d.lien)) return toast('Le lien doit commencer par https://', 'erreur');
+        try {
+          if (r) {
+            const changeCat = r.categorie !== d.categorie;
+            await S.modifier('realisations', r.id, changeCat ? { ...d, ordre: prochainOrdre('realisations') } : d);
+          } else await S.creer('realisations', { ...d, ordre: prochainOrdre('realisations') });
+          fermerFenetre(); toast(r ? 'Projet modifié' : 'Projet ajouté');
+        } catch (err) { erreur(err); }
+      };
+    }
   });
 }
 

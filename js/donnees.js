@@ -87,7 +87,7 @@ export const PAGES_TEXTES = [
   { id: 'projets', titre: 'Projets', ancre: '#projets', zones: [
     { titre: 'Haut de page', champs: ENTETE('projets') },
     { titre: 'Liste des projets', champs: [c('projets_section_eyebrow', 'Petit titre', 'ligne'), c('projets_section_titre', 'Titre', 'ligne')] },
-  ], note: 'Les projets se gèrent dans l’écran « Projets ».', lienNote: '#projets' },
+  ], note: 'Les catégories et les projets se gèrent dans les écrans « Projets numériques » et « Catégories de projets ».', lienNote: '#realisations' },
   { id: 'cosplay', titre: 'Cosplay', ancre: '#cosplay', zones: [
     { titre: 'Haut de page', champs: ENTETE('cosplay') },
     { titre: 'Présentation', champs: [c('cosplay_edito_eyebrow', 'Petit titre', 'ligne'), c('cosplay_edito', 'Texte'), c('cosplay_section_titre', 'Titre de la liste', 'ligne')] },
@@ -130,7 +130,6 @@ export const IMAGES_SITE = [
 
 // ---------------------------------------------------------------- Listes
 export const STATUTS_LIVRE = { disponible: 'Disponible', bientot: 'Bientôt', ecriture: 'En écriture' };
-export const TYPES_PROJET = { site: 'Site web', application: 'Application', jeu: 'Jeu', autre: 'Autre' };
 export const CATEGORIES_PHOTO = { paysages: 'Paysages', lumieres: 'Lumières', atmospheres: 'Atmosphères', portraits: 'Portraits', macro: 'Macro', urbain: 'Urbain', autres: 'Autres' };
 
 const IMG = 'https://kmauger18.github.io/kmauger/assets/img/livres/';
@@ -182,8 +181,60 @@ export const PHOTOS_ORIGINE = [
   { legende: 'Lumières', categorie: 'lumieres', apercu: U('photo-1490730141103-6cac27aaab94', 900), hd: false, visible: true, ordre: 2 },
   { legende: 'Atmosphères', categorie: 'atmospheres', apercu: U('photo-1519608487953-e999c86e7455', 900), hd: false, visible: true, ordre: 3 },
 ];
-export const PROJETS_ORIGINE = [
-  { titre: 'Sites web', type: 'site', description: 'Design, développement et expériences web.', technologies: '', lien: '', libelleLien: '', image: U('photo-1559028012-481c04fa702d', 900), visible: true, ordre: 1 },
-  { titre: 'Applications', type: 'application', description: 'Outils numériques et interfaces utiles.', technologies: '', lien: '', libelleLien: '', image: U('photo-1551650975-87deedd944c3', 900), visible: true, ordre: 2 },
-  { titre: 'Jeux', type: 'jeu', description: 'Concepts, univers et prototypes interactifs.', technologies: '', lien: '', libelleLien: '', image: U('photo-1542751371-adc38448a05e', 900), visible: true, ordre: 3 },
+const IMG_P = 'https://kmauger18.github.io/kmauger/assets/img/projets/';
+export const CATEGORIES_ORIGINE = [
+  { id: 'sites', titre: 'Sites web', description: 'Design, développement et expériences web.', image: IMG_P + 'cat-sites.jpg', visible: true, ordre: 1 },
+  { id: 'applications', titre: 'Applications', description: 'Outils numériques et interfaces utiles.', image: IMG_P + 'cat-applications.jpg', visible: true, ordre: 2 },
+  { id: 'jeux', titre: 'Jeux', description: 'Concepts, univers et prototypes interactifs.', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', visible: true, ordre: 3 },
 ];
+
+export const REALISATIONS_ORIGINE = [
+  {
+    titre: 'Normandy Soldiers Memory', categorie: 'sites', statut: 'en-ligne', annee: '2026',
+    accroche: 'Le site d’une association de reconstitution historique de la Seconde Guerre mondiale, avec son espace de gestion.',
+    description: 'Normandy Soldiers Memory fait revivre le quotidien civil et militaire de 1939-1945, à Ifs, dans le Calvados. J’ai conçu le site de A à Z : une identité « dossier d’archives » avec des typographies d’époque, huit pages et une galerie « Archives du Front » avec filtres et visionneuse.\n\nLe bureau de l’association gère lui-même son contenu depuis un espace privé : textes, agenda des sorties, historique, questions fréquentes, photos et bandeau d’annonce, sans jamais toucher au code.',
+    points: 'Huit pages : association, activités, historique, archives, agenda, nous rejoindre, contact\nGalerie photo avec filtres par catégorie et visionneuse\nAgenda qui retire tout seul les dates passées\nEspace de gestion sécurisé pour l’association\nPensé pour le téléphone autant que pour l’ordinateur',
+    plateforme: 'Site web', technologies: 'HTML, CSS, JavaScript, Firebase',
+    lien: 'https://kmauger18.github.io/normandy-soldiers-memory/', libelleLien: 'Voir le site',
+    image: IMG_P + 'nsm-cover.jpg', captures: [IMG_P + 'nsm-1.jpg', IMG_P + 'nsm-2.jpg', IMG_P + 'nsm-3.jpg'], visible: true, ordre: 1,
+  },
+  {
+    titre: 'Juste une part, merci !', categorie: 'sites', statut: 'en-ligne', annee: '2026',
+    accroche: 'Le site d’une pâtisserie artisanale : pâtisserie française traditionnelle et cake design.',
+    description: 'Une vitrine gourmande pour une pâtissière qui fait tout elle-même : la carte des pâtisseries classée par familles, un créateur de gâteau sur mesure pour les mariages et les anniversaires, son histoire et le contact. Les commandes se retirent à l’atelier.\n\nDerrière le site, un espace de gestion lui est réservé : commandes, produits, stock, recettes, catalogue du site et tableau de bord.',
+    points: 'Carte des pâtisseries par familles\nCréateur de gâteau sur mesure\nPanier et retrait à l’atelier\nEspace de gestion : commandes, stock, recettes et catalogue\nDesign chaleureux, pensé pour le téléphone',
+    plateforme: 'Site web', technologies: 'HTML, CSS, JavaScript, Firebase',
+    lien: 'https://kmauger18.github.io/Juste-une-part-merci-/', libelleLien: 'Voir le site',
+    image: IMG_P + 'jupm-cover.jpg', captures: [IMG_P + 'jupm-1.jpg', IMG_P + 'jupm-2.jpg', IMG_P + 'jupm-3.jpg'], visible: true, ordre: 2,
+  },
+  {
+    titre: 'Mijote', categorie: 'applications', statut: 'beta', annee: '2026',
+    accroche: 'Les repas de la semaine et une liste de courses déjà chiffrée, en une minute. 100 % gratuit.',
+    description: 'Mijote compose les menus de la semaine selon le foyer, les repas à prévoir, le régime et le budget, puis prépare la liste de courses classée par rayon, avec le prix de chaque article dans le supermarché choisi.\n\nLes prix viennent de relevés réels en magasin, et une marge de sécurité réglable évite les mauvaises surprises en caisse. Plus de 1 100 recettes, une recherche par nom ou par ingrédient, et la possibilité de créer ses propres recettes.',
+    points: 'Menus de la semaine composés selon le budget\nListe de courses chiffrée et classée par rayon\nPrix réels relevés en magasin (Open Prices)\n1 187 recettes, dont des petits-déjeuners et 372 végétariennes\nRecherche et création de recettes\nTout reste sur le téléphone, sans compte',
+    plateforme: 'Android', technologies: 'HTML, CSS, JavaScript, Capacitor',
+    lien: '', libelleLien: '',
+    image: IMG_P + 'mijote-cover.jpg', captures: [IMG_P + 'mijote-1.jpg', IMG_P + 'mijote-2.jpg', IMG_P + 'mijote-3.jpg', IMG_P + 'mijote-4.jpg', IMG_P + 'mijote-5.jpg'], visible: true, ordre: 1,
+  },
+  {
+    titre: 'PitWall', categorie: 'applications', statut: 'beta', annee: '2026',
+    accroche: 'Un dashboard de télémétrie gratuit et entièrement personnalisable pour les jeux de course.',
+    description: 'PitWall transforme un téléphone ou une tablette en écran de bord : régime moteur, rapport, chronos, delta, pneus, essence, ERS… L’appli se connecte à la console par son adresse IP et affiche la télémétrie du jeu en direct.\n\nL’éditeur est totalement libre : chaque widget se place, se redimensionne et se superpose au doigt, sans limite de nombre. On crée autant de dashboards qu’on veut, utilisables avec tous les jeux, et on les partage en fichier.',
+    points: 'Gran Turismo 7 et Sport (PS5 et PS4), F1 23 à 25, Forza, DiRT Rally\n14 types de widgets et une centaine de données\nWidgets illimités, superposables et redimensionnables\nPlusieurs pages à faire défiler en course\nExport et import des dashboards en fichier\nDiagnostic qui explique ce qui bloque la connexion',
+    plateforme: 'Android', technologies: 'Flutter, Dart',
+    lien: 'https://studio-prism.com/telechargements/PitWall.apk', libelleLien: 'Télécharger l’APK',
+    image: IMG_P + 'pitwall-cover.jpg', captures: [IMG_P + 'pitwall-1.jpg', IMG_P + 'pitwall-2.jpg', IMG_P + 'pitwall-3.jpg', IMG_P + 'pitwall-4.jpg', IMG_P + 'pitwall-5.jpg', IMG_P + 'pitwall-6.jpg'], visible: true, ordre: 2,
+  },
+  {
+    titre: 'Clé de 12', categorie: 'applications', statut: 'prive', annee: '2026',
+    accroche: 'L’appli d’un atelier mécanique : clients, véhicules, interventions et rappels d’entretien.',
+    description: 'Née d’un simple classeur de suivi d’atelier, Clé de 12 rassemble tout le quotidien d’un garage dans le téléphone : fiches clients et véhicules, interventions à plusieurs prestations, tableau de bord du chiffre d’affaires et des pièces.\n\nL’appli calcule seule les prochains entretiens (vidange, révision, distribution, freins) d’après l’historique et le kilométrage, envoie des notifications et synchronise ses rendez-vous avec Google Agenda. Les données restent sur le téléphone, avec une sauvegarde complète en un fichier.',
+    points: 'Clients, véhicules et interventions\nRecherche avancée et filtres combinables\nRappels d’entretien automatiques, au mois ou au kilomètre\nRendez-vous synchronisés avec Google Agenda\nNotifications sur le téléphone\nSauvegarde et restauration complètes',
+    plateforme: 'Android', technologies: 'HTML, JavaScript, Android',
+    lien: '', libelleLien: '',
+    image: IMG_P + 'cle12-cover.jpg', captures: [IMG_P + 'cle12-1.jpg', IMG_P + 'cle12-2.jpg', IMG_P + 'cle12-3.jpg'], visible: true, ordre: 3,
+  },
+];
+
+export const STATUTS_PROJET = { 'en-ligne': 'En ligne', beta: 'Bêta', dev: 'En développement', prive: 'Usage privé' };
+

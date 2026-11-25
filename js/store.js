@@ -1,8 +1,8 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611251924';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, PROJETS_ORIGINE } from './donnees.js?v=202611251924';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252005';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252005';
 
-export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'cosplays'];
+export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
 
 // Données en mémoire : { livres: { id: {...} }, ... }
@@ -23,6 +23,7 @@ export function surErreur(f) { gestionnaireErreur = f; }
 export function utilisateurCourant() { return fb?.auth?.currentUser?.email || (mode === 'demo' ? 'mode démo' : ''); }
 export function messageErreur(err) {
   const code = err?.code || '';
+  if (code === 'categorie-non-vide') return err.message;
   if (code.includes('permission-denied')) return `Firebase a refusé l'accès (compte : ${utilisateurCourant() || 'aucun'}). Vérifiez que les règles du fichier firestore.rules sont bien publiées dans Firebase, puis reconnectez-vous.`;
   if (code.includes('unavailable') || code.includes('network')) return 'Firebase est injoignable (pas de réseau, ou un bloqueur de publicité). Les modifications sont gardées sur l\'appareil et partiront dès que la connexion revient.';
   if (code.includes('unauthenticated')) return 'Session expirée : déconnectez-vous puis reconnectez-vous.';
@@ -59,13 +60,14 @@ function nettoyer(obj) { return JSON.parse(JSON.stringify(obj)); }
 // =====================================================================
 //  MODE DÉMO
 // =====================================================================
-const CLE_DEMO = 'kmauger-gestion-demo-v2';
+const CLE_DEMO = 'kmauger-gestion-demo-v3';
 function contenuOrigine() {
   const d = Object.fromEntries(COLLECTIONS.map(c => [c, {}]));
   d.contenu = { textes: { ...TEXTES_ORIGINE }, liens: { ...LIENS_ORIGINE } };
   LIVRES_ORIGINE.forEach((e, i) => d.livres['liv' + i] = { ...e });
   PHOTOS_ORIGINE.forEach((e, i) => d.photos['pho' + i] = { ...e });
-  PROJETS_ORIGINE.forEach((e, i) => d.projets['pro' + i] = { ...e });
+  CATEGORIES_ORIGINE.forEach(({ id, ...e }) => d.projets[id] = e);
+  REALISATIONS_ORIGINE.forEach((e, i) => d.realisations['rea' + i] = { ...e });
   return d;
 }
 const demo = {
@@ -234,7 +236,8 @@ export async function importerOrigine({ ecraser = false } = {}) {
   if (ecraser || !db.contenu.textes) set('contenu', 'textes', TEXTES_ORIGINE);
   if (ecraser || !db.contenu.liens) set('contenu', 'liens', LIENS_ORIGINE);
   if (ecraser || !Object.keys(db.livres).length) LIVRES_ORIGINE.forEach((e, i) => set('livres', 'origine' + i, e));
-  if (ecraser || !Object.keys(db.projets).length) PROJETS_ORIGINE.forEach((e, i) => set('projets', 'origine' + i, e));
+  if (ecraser || !Object.keys(db.projets).length) CATEGORIES_ORIGINE.forEach(({ id, ...e }) => set('projets', id, e));
+  if (ecraser || !Object.keys(db.realisations).length) REALISATIONS_ORIGINE.forEach((e, i) => set('realisations', 'origine' + i, e));
   const deja = new Set(Object.values(db.photos).map(p => p.apercu));
   PHOTOS_ORIGINE.forEach((p, i) => { if (!deja.has(p.apercu)) set('photos', 'origine' + i, { ...p, ajouteLe: Date.now() }); });
   if (!ops.length) return 0;

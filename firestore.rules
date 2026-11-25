@@ -29,7 +29,7 @@ service cloud.firestore {
       allow write: if estGestionnaire();
     }
 
-    // Livres, photos, projets, cosplays : le site ne lit que ce qui est visible
+    // Livres, photos, catégories de projets, projets, cosplays : le site ne lit que ce qui est visible
     match /livres/{id} {
       allow read: if resource.data.visible == true || estGestionnaire();
       allow write: if estGestionnaire();
@@ -39,6 +39,10 @@ service cloud.firestore {
       allow write: if estGestionnaire();
     }
     match /projets/{id} {
+      allow read: if resource.data.visible == true || estGestionnaire();
+      allow write: if estGestionnaire();
+    }
+    match /realisations/{id} {
       allow read: if resource.data.visible == true || estGestionnaire();
       allow write: if estGestionnaire();
     }

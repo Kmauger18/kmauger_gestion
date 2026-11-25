@@ -1,8 +1,8 @@
 // Démarrage, connexion, navigation
-import * as S from './store.js?v=202611252017';
-import { VUES } from './vues.js?v=202611252017';
-import { $, $$, esc, ic, toast, fermerFenetre } from './ui.js?v=202611252017';
-import { SITE_URL } from '../firebase-config.js?v=202611252017';
+import * as S from './store.js?v=202611252049';
+import { VUES } from './vues.js?v=202611252049';
+import { $, $$, esc, ic, toast, fermerFenetre } from './ui.js?v=202611252049';
+import { SITE_URL } from '../firebase-config.js?v=202611252049';
 
 const MENU = [
   ['tableau'], ['—', 'Mes univers'], ['livres'], ['photos'], ['realisations'], ['categories'], ['cosplays'],
@@ -92,6 +92,10 @@ function demarrer(user) {
   construireMenu();
   window.addEventListener('hashchange', () => { fermerFenetre(); rendreVue(); });
   S.surChangement(() => rendreVue());
+  // Corrections automatiques du contenu hérité de la maquette (une seule fois)
+  let majFaite = false;
+  const maj = () => { if (majFaite || !S.chargementTermine()) return; majFaite = true; S.miseAJourContenu().then(n => { if (n > 0) toast('Contenu du site mis à jour (textes traduits, e-mail, images d’exemple retirées)'); }).catch(() => { majFaite = false; }); };
+  S.surChangement(maj); maj();
   S.surErreur(err => toast(S.messageErreur(err), 'erreur'));
   $('#contenu').addEventListener('input', () => { $('#contenu').dataset.modifie = '1'; majPastilleTextes(); });
   window.addEventListener('beforeunload', e => { if (VUES.textes.aDesModifications()) { e.preventDefault(); e.returnValue = ''; } });

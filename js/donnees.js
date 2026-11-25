@@ -1,16 +1,15 @@
 // Contenu d'origine du site KMAUGER. (tel qu'il est écrit dans index.html du dépôt kmauger)
 // et description des écrans de saisie.
 
-const U = (id, w) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 // ---------------------------------------------------------------- Textes
 // *mot* = italique sur le site ; un retour à la ligne = retour à la ligne sur le site
 export const TEXTES_ORIGINE = {
-  accueil_eyebrow: 'Personal creative universe · Bienvenue',
+  accueil_eyebrow: 'Univers créatif · Bienvenue',
   accueil_titre: 'Des idées.\n*Des univers.*\nUne signature.',
   accueil_intro: 'Je suis Kéliann Mauger. J’explore différentes formes de création, de l’écriture à l’image, du numérique au costume. Voici mon univers.',
   accueil_bouton: 'Découvrir mon univers',
-  accueil_image_tag: 'KMAUGER. — Creative universe',
+  accueil_image_tag: 'KMAUGER. — Univers créatif',
   accueil_citation: '« Créer, explorer, raconter. »',
   accueil_citation_sous: 'Une identité · Plusieurs passions',
   accueil_univers_eyebrow: 'Explorer',
@@ -59,7 +58,7 @@ export const TEXTES_ORIGINE = {
   contact_titre: 'Une idée ?\n*Parlons-en.*',
   contact_intro: 'Une question, une proposition, une collaboration ou simplement l’envie d’échanger autour d’un projet ? Retrouve-moi sur mes réseaux.',
   contact_bloc_eyebrow: 'Restons connectés',
-  contact_bloc_titre: 'Let’s create\nsomething.',
+  contact_bloc_titre: 'Créons quelque\nchose ensemble.',
 
   // Sections ajoutées
   accueil_bandeau: "Écriture · Photographie · Sites web · Applications · Jeux · Cosplay · Création",
@@ -142,39 +141,39 @@ export const PAGES_TEXTES = [
     { titre: 'Appel à contact', champs: [c('accueil_cta_titre', 'Titre', 'titre'), c('accueil_cta_texte', 'Texte', 'texte'), c('accueil_cta_bouton', 'Texte du bouton', 'ligne')] },
     { titre: 'Pied de page', champs: [c('pied_texte', 'Texte du pied de page', 'texte')] },
   ] },
-  { id: 'livres', titre: 'Livres', ancre: '#livres', zones: [
+  { id: 'livres', titre: 'Livres', ancre: 'livres/', zones: [
     { titre: 'Haut de page', champs: ENTETE('livres') },
     { titre: 'Liste des livres', champs: [c('livres_section_eyebrow', 'Petit titre', 'ligne'), c('livres_section_titre', 'Titre', 'ligne')] },
     { titre: 'L’écriture', champs: [c('livres_edito_eyebrow', 'Petit titre', 'ligne'), c('livres_edito', 'Texte', 'texte')] },
     { titre: 'Où trouver mes livres', champs: [c('livres_ou_eyebrow', 'Petit titre', 'ligne'), c('livres_ou_texte', 'Texte', 'texte')] },
   ], note: 'Les livres eux-mêmes se gèrent dans l’écran « Livres ».', lienNote: '#livres' },
-  { id: 'photographie', titre: 'Photographie', ancre: '#photographie', zones: [
+  { id: 'photographie', titre: 'Photographie', ancre: 'photographie/', zones: [
     { titre: 'Haut de page', champs: ENTETE('photo') },
     { titre: 'Galerie', champs: [c('photo_section_eyebrow', 'Petit titre', 'ligne'), c('photo_section_titre', 'Titre', 'ligne')] },
     { titre: 'Mon regard', champs: [c('photo_edito_eyebrow', 'Petit titre', 'ligne'), c('photo_edito', 'Texte', 'texte'), c('photo_themes_eyebrow', 'Titre des thèmes', 'ligne')] },
     { titre: 'Instagram', champs: [c('photo_insta_texte', 'Texte', 'ligne')] },
   ], note: 'Les photos se gèrent dans l’écran « Photographie ».', lienNote: '#photos' },
-  { id: 'projets', titre: 'Projets', ancre: '#projets', zones: [
+  { id: 'projets', titre: 'Projets', ancre: 'projets/', zones: [
     { titre: 'Haut de page', champs: ENTETE('projets') },
     { titre: 'Liste des projets', champs: [c('projets_section_eyebrow', 'Petit titre', 'ligne'), c('projets_section_titre', 'Titre', 'ligne')] },
     { titre: 'Projet à la une', champs: [c('projets_une_eyebrow', 'Petit titre', 'ligne')] },
     { titre: 'Méthode', champs: [c('projets_methode_eyebrow', 'Petit titre', 'ligne'), c('projets_methode_titre', 'Titre', 'titre'), c('projets_etape1_titre', 'Étape 1 — titre', 'ligne'), c('projets_etape1_texte', 'Étape 1 — texte', 'texte'), c('projets_etape2_titre', 'Étape 2 — titre', 'ligne'), c('projets_etape2_texte', 'Étape 2 — texte', 'texte'), c('projets_etape3_titre', 'Étape 3 — titre', 'ligne'), c('projets_etape3_texte', 'Étape 3 — texte', 'texte'), c('projets_etape4_titre', 'Étape 4 — titre', 'ligne'), c('projets_etape4_texte', 'Étape 4 — texte', 'texte')] },
     { titre: 'Outils', champs: [c('projets_techs_eyebrow', 'Petit titre', 'ligne')] },
   ], note: 'Les catégories et les projets se gèrent dans les écrans « Projets numériques » et « Catégories de projets ».', lienNote: '#realisations' },
-  { id: 'cosplay', titre: 'Cosplay', ancre: '#cosplay', zones: [
+  { id: 'cosplay', titre: 'Cosplay', ancre: 'cosplay/', zones: [
     { titre: 'Haut de page', champs: ENTETE('cosplay') },
     { titre: 'Présentation', champs: [c('cosplay_edito_eyebrow', 'Petit titre', 'ligne'), c('cosplay_edito', 'Texte'), c('cosplay_section_titre', 'Titre de la liste', 'ligne')] },
     { titre: 'Le processus', champs: [c('cosplay_process_eyebrow', 'Petit titre', 'ligne'), c('cosplay_process_titre', 'Titre', 'titre'), c('cosplay_etape1_titre', 'Étape 1 — titre', 'ligne'), c('cosplay_etape1_texte', 'Étape 1 — texte', 'texte'), c('cosplay_etape2_titre', 'Étape 2 — titre', 'ligne'), c('cosplay_etape2_texte', 'Étape 2 — texte', 'texte'), c('cosplay_etape3_titre', 'Étape 3 — titre', 'ligne'), c('cosplay_etape3_texte', 'Étape 3 — texte', 'texte'), c('cosplay_etape4_titre', 'Étape 4 — titre', 'ligne'), c('cosplay_etape4_texte', 'Étape 4 — texte', 'texte')] },
     { titre: 'Instagram', champs: [c('cosplay_insta_texte', 'Texte', 'ligne')] },
   ], note: 'Les cosplays se gèrent dans l’écran « Cosplay ».', lienNote: '#cosplays' },
-  { id: 'apropos', titre: 'À propos', ancre: '#apropos', zones: [
+  { id: 'apropos', titre: 'À propos', ancre: 'a-propos/', zones: [
     { titre: 'Haut de page', champs: ENTETE('apropos') },
     { titre: 'Présentation', champs: [c('apropos_bloc_eyebrow', 'Petit titre', 'ligne'), c('apropos_bloc_titre', 'Titre', 'titre'), c('apropos_p1', 'Paragraphe 1'), c('apropos_p2', 'Paragraphe 2')] },
     { titre: 'Chiffres', champs: [c('apropos_chiffres_eyebrow', 'Petit titre', 'ligne')] },
     { titre: 'Ce qui m’anime', champs: [c('apropos_valeurs_eyebrow', 'Petit titre', 'ligne'), c('apropos_v1_titre', 'Valeur 1 — titre', 'ligne'), c('apropos_v1_texte', 'Valeur 1 — texte', 'texte'), c('apropos_v2_titre', 'Valeur 2 — titre', 'ligne'), c('apropos_v2_texte', 'Valeur 2 — texte', 'texte'), c('apropos_v3_titre', 'Valeur 3 — titre', 'ligne'), c('apropos_v3_texte', 'Valeur 3 — texte', 'texte')] },
     { titre: 'Mes univers', champs: [c('apropos_univers_eyebrow', 'Petit titre', 'ligne')] },
   ] },
-  { id: 'contact', titre: 'Contact', ancre: '#contact', zones: [
+  { id: 'contact', titre: 'Contact', ancre: 'contact/', zones: [
     { titre: 'Haut de page', champs: ENTETE('contact') },
     { titre: 'Bloc noir', champs: [c('contact_bloc_eyebrow', 'Petit titre', 'ligne'), c('contact_bloc_titre', 'Titre', 'titre')] },
     { titre: 'Pourquoi m’écrire', champs: [c('contact_raisons_eyebrow', 'Petit titre', 'ligne'), c('contact_r1_titre', 'Raison 1 — titre', 'ligne'), c('contact_r1_texte', 'Raison 1 — texte', 'texte'), c('contact_r2_titre', 'Raison 2 — titre', 'ligne'), c('contact_r2_texte', 'Raison 2 — texte', 'texte'), c('contact_r3_titre', 'Raison 3 — titre', 'ligne'), c('contact_r3_texte', 'Raison 3 — texte', 'texte'), c('contact_r4_titre', 'Raison 4 — titre', 'ligne'), c('contact_r4_texte', 'Raison 4 — texte', 'texte')] },
@@ -185,7 +184,7 @@ export const PAGES_TEXTES = [
 export const LIENS_ORIGINE = {
   instagram_perso: 'https://www.instagram.com/kmauger18/',
   instagram_projets: 'https://www.instagram.com/kmauger.studio/',
-  email: '',
+  email: 'keliannmauger@gmail.com',
 };
 export const CHAMPS_LIENS = [
   { cle: 'instagram_perso', label: 'Instagram personnel', type: 'url' },
@@ -195,15 +194,15 @@ export const CHAMPS_LIENS = [
 
 // ---------------------------------------------------------------- Images du site
 export const IMAGES_SITE = [
-  { cle: 'accueil_hero', label: 'Grande photo de l’accueil', page: 'Accueil', origine: U('photo-1497366754035-f200968a6e72', 1400) },
+  { cle: 'accueil_hero', label: 'Grande photo de l’accueil', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/hero.webp' },
   { cle: 'carte_livres', label: 'Carte « Livres »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/carte-livres.jpg' },
-  { cle: 'carte_photo', label: 'Carte « Photographie »', page: 'Accueil', origine: U('photo-1452587925148-ce544e77e70d', 1000) },
+  { cle: 'carte_photo', label: 'Carte « Photographie »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/carte-photo.webp' },
   { cle: 'carte_projets', label: 'Carte « Projets »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/carte-projets.jpg' },
-  { cle: 'carte_cosplay', label: 'Carte « Cosplay »', page: 'Accueil', origine: U('photo-1531058020387-3be344556be6', 1000) },
+  { cle: 'carte_cosplay', label: 'Carte « Cosplay »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/carte-cosplay.webp' },
   { cle: 'livres_banniere', label: 'Bannière', page: 'Livres', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/banniere-livres.jpg' },
-  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: U('photo-1470770841072-f978cf4d019e', 1800) },
+  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/banniere-photo.webp' },
   { cle: 'projets_banniere', label: 'Bannière', page: 'Projets', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/banniere-projets.jpg' },
-  { cle: 'cosplay_banniere', label: 'Bannière', page: 'Cosplay', origine: U('photo-1531058020387-3be344556be6', 1800) },
+  { cle: 'cosplay_banniere', label: 'Bannière', page: 'Cosplay', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/banniere-cosplay.webp' },
   { cle: 'apropos_portrait', label: 'Portrait (à la place du logo)', page: 'À propos', origine: 'img/logo.png' },
 ];
 
@@ -256,15 +255,12 @@ export const LIVRES_ORIGINE = [
 ];
 
 export const PHOTOS_ORIGINE = [
-  { legende: 'Paysages', categorie: 'paysages', apercu: U('photo-1470770841072-f978cf4d019e', 900), hd: false, visible: true, ordre: 1 },
-  { legende: 'Lumières', categorie: 'lumieres', apercu: U('photo-1490730141103-6cac27aaab94', 900), hd: false, visible: true, ordre: 2 },
-  { legende: 'Atmosphères', categorie: 'atmospheres', apercu: U('photo-1519608487953-e999c86e7455', 900), hd: false, visible: true, ordre: 3 },
 ];
 const IMG_P = 'https://kmauger18.github.io/kmauger/assets/img/projets/';
 export const CATEGORIES_ORIGINE = [
   { id: 'sites', titre: 'Sites web', description: 'Design, développement et expériences web.', image: IMG_P + 'cat-sites.jpg', visible: true, ordre: 1 },
   { id: 'applications', titre: 'Applications', description: 'Outils numériques et interfaces utiles.', image: IMG_P + 'cat-applications.jpg', visible: true, ordre: 2 },
-  { id: 'jeux', titre: 'Jeux', description: 'Concepts, univers et prototypes interactifs.', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', visible: true, ordre: 3 },
+  { id: 'jeux', titre: 'Jeux', description: 'Concepts, univers et prototypes interactifs.', image: 'https://kmauger18.github.io/kmauger/assets/img/deco/cat-jeux.webp', visible: true, ordre: 3 },
 ];
 
 export const REALISATIONS_ORIGINE = [

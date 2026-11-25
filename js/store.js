@@ -1,6 +1,6 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252017';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252017';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252049';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252049';
 
 export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
@@ -254,6 +254,34 @@ export async function importerOrigine({ ecraser = false } = {}) {
   if (!ops.length) return 0;
   await lot(ops);
   return ops.length;
+}
+
+// ---------- Mise à jour automatique (une fois, à l'ouverture) ----------
+// Corrige le contenu hérité de la maquette : textes en anglais, e-mail public absent,
+// photos et images d'exemple (Unsplash). Ne touche jamais à ce que vous avez saisi vous-même.
+const ANCIENS_TEXTES = {
+  accueil_eyebrow: ['Personal creative universe · Bienvenue', 'Univers créatif · Bienvenue'],
+  accueil_image_tag: ['KMAUGER. — Creative universe', 'KMAUGER. — Univers créatif'],
+  contact_bloc_titre: ['Let’s create\nsomething.', 'Créons quelque\nchose ensemble.'],
+};
+const VERSION_MAJ = 1;
+export async function miseAJourContenu() {
+  if (!chargementTermine() || !db.contenu.liens || (db.contenu.liens.majContenu || 0) >= VERSION_MAJ) return 0;
+  const ops = [];
+  const t = db.contenu.textes;
+  if (t) {
+    const champs = {};
+    for (const [k, [ancien, nouveau]] of Object.entries(ANCIENS_TEXTES)) if (t[k] === ancien) champs[k] = nouveau;
+    if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'contenu', id: 'textes', data: champs });
+  }
+  const l = db.contenu.liens;
+  ops.push({ type: 'merge', col: 'contenu', id: 'liens', data: { majContenu: VERSION_MAJ, ...(String(l.email || '').trim() ? {} : { email: LIENS_ORIGINE.email }) } });
+  const unsplash = v => /images\.unsplash\.com/.test(v || '');
+  for (const [id, p] of Object.entries(db.photos)) if (unsplash(p.apercu) && p.visible !== false) ops.push({ type: 'merge', col: 'photos', id, data: { visible: false } });
+  const jeux = CATEGORIES_ORIGINE.find(c => c.id === 'jeux');
+  for (const [id, c] of Object.entries(db.projets)) if (unsplash(c.image)) ops.push({ type: 'merge', col: 'projets', id, data: { image: /jeu/i.test(c.titre) ? jeux.image : '' } });
+  await lot(ops);
+  return ops.length - 1;
 }
 
 // ---------- Sauvegarde ----------

@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611252017';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252017';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252017';
-import { SITE_URL } from '../firebase-config.js?v=202611252017';
+import * as S from './store.js?v=202611252049';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252049';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252049';
+import { SITE_URL } from '../firebase-config.js?v=202611252049';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -419,7 +419,7 @@ export const VUES = {
         const v = lireFormulaire(e.target);
         if ([v.instagram_perso, v.instagram_projets].some(u => u && !/^https?:\/\//i.test(u))) return toast('Les liens doivent commencer par https://', 'erreur');
         if (v.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return toast('Adresse e-mail invalide', 'erreur');
-        try { okEnregistre(await S.enregistrer('contenu', 'liens', v)); } catch (err) { erreur(err); }
+        try { okEnregistre(await S.enregistrer('contenu', 'liens', { ...v, majContenu: S.liens().majContenu || 0 })); } catch (err) { erreur(err); }
       };
     }
   },

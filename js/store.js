@@ -1,6 +1,6 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252049';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252049';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252109';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252109';
 
 export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
@@ -264,7 +264,8 @@ const ANCIENS_TEXTES = {
   accueil_image_tag: ['KMAUGER. — Creative universe', 'KMAUGER. — Univers créatif'],
   contact_bloc_titre: ['Let’s create\nsomething.', 'Créons quelque\nchose ensemble.'],
 };
-const VERSION_MAJ = 1;
+const VERSION_MAJ = 2;
+const CHAMPS_FICHE = ['lieu', 'themes', 'personnages', 'indices', 'extrait', 'citations', 'musique', 'playlist', 'coulisses', 'suite'];
 export async function miseAJourContenu() {
   if (!chargementTermine() || !db.contenu.liens || (db.contenu.liens.majContenu || 0) >= VERSION_MAJ) return 0;
   const ops = [];
@@ -275,7 +276,15 @@ export async function miseAJourContenu() {
     if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'contenu', id: 'textes', data: champs });
   }
   const l = db.contenu.liens;
-  ops.push({ type: 'merge', col: 'contenu', id: 'liens', data: { majContenu: VERSION_MAJ, ...(String(l.email || '').trim() ? {} : { email: LIENS_ORIGINE.email }) } });
+  ops.push({ type: 'merge', col: 'contenu', id: 'liens', data: { majContenu: VERSION_MAJ, ...(String(l.email || '').trim() || (l.majContenu || 0) >= 1 ? {} : { email: LIENS_ORIGINE.email }) } });
+  // v2 : contenu de la fiche détaillée pour les livres d'origine (champs encore absents seulement)
+  const normTitre = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, '').toLowerCase().trim();
+  for (const [id, liv] of Object.entries(db.livres)) {
+    const o = LIVRES_ORIGINE.find(x => normTitre(x.titre) === normTitre(liv.titre));
+    if (!o) continue;
+    const champs = Object.fromEntries(CHAMPS_FICHE.filter(k => o[k] && liv[k] === undefined).map(k => [k, o[k]]));
+    if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'livres', id, data: champs });
+  }
   const unsplash = v => /images\.unsplash\.com/.test(v || '');
   for (const [id, p] of Object.entries(db.photos)) if (unsplash(p.apercu) && p.visible !== false) ops.push({ type: 'merge', col: 'photos', id, data: { visible: false } });
   const jeux = CATEGORIES_ORIGINE.find(c => c.id === 'jeux');

@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611252049';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252049';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252049';
-import { SITE_URL } from '../firebase-config.js?v=202611252049';
+import * as S from './store.js?v=202611252109';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252109';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252109';
+import { SITE_URL } from '../firebase-config.js?v=202611252109';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -512,7 +512,7 @@ const lienValide = u => !u || /^https?:\/\//i.test(u);
 function formLivre(l = null) {
   formulaireAvecImage({
     id: 'fl', col: 'livres', element: l, titre: l ? 'Modifier le livre' : 'Nouveau livre',
-    defaut: { titre: '', genre: '', statut: 'bientot', accroche: '', description: '', couverture: '', pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '', lienAmazon: '', lienCoolLibri: '', visible: true },
+    defaut: { titre: '', genre: '', statut: 'bientot', accroche: '', description: '', couverture: '', pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '', lienAmazon: '', lienCoolLibri: '', lieu: '', themes: '', personnages: '', indices: '', extrait: '', citations: '', musique: '', playlist: '', coulisses: '', suite: '', visible: true },
     image: { cle: 'couverture', label: 'Couverture', portrait: true, largeur: 800, plafond: 260000 },
     corps: v => `
       ${champ({ cle: 'titre', label: 'Titre', valeur: v.titre, requis: true })}
@@ -535,6 +535,20 @@ function formLivre(l = null) {
         ${champ({ cle: 'langue', label: 'Langue', valeur: v.langue })}
         ${champ({ cle: 'prix', label: 'Prix (facultatif)', valeur: v.prix, placeholder: 'Ex. : 14,08 €' })}
       </div>
+      <h3 class="sous-titre-form">Fiche détaillée du livre</h3>
+      <p class="aide">Chaque bloc rempli ajoute une section à la page du livre sur le site ; un bloc vide n'apparaît pas.</p>
+      <div class="grille-champs">
+        ${champ({ cle: 'lieu', label: 'Lieu de l’histoire', valeur: v.lieu, placeholder: 'Ex. : Rennes' })}
+        ${champ({ cle: 'themes', label: 'Thèmes', valeur: v.themes, placeholder: 'Séparés par des virgules' })}
+      </div>
+      ${champ({ cle: 'personnages', label: 'Personnages', type: 'texte', valeur: v.personnages, aide: 'Un personnage par ligne : Nom — description.' })}
+      ${champ({ cle: 'indices', label: 'Indices / détails à remarquer', type: 'texte', valeur: v.indices, aide: 'Un par ligne. Attention à ne rien dévoiler de la fin !' })}
+      ${champ({ cle: 'extrait', label: 'Extrait à feuilleter', type: 'texte', valeur: v.extrait, aide: 'Les premières pages, par exemple. Une ligne vide = nouveau paragraphe.' })}
+      ${champ({ cle: 'citations', label: 'Citations', type: 'texte', valeur: v.citations, aide: 'Une par ligne. La première est mise en grand.' })}
+      ${champ({ cle: 'musique', label: 'Musique (présentation)', type: 'texte', valeur: v.musique, aide: 'Si le livre a une playlist : comment l’utiliser.' })}
+      ${champ({ cle: 'playlist', label: 'Playlist', type: 'texte', valeur: v.playlist, aide: 'Un morceau par ligne : Titre — Artiste. Vide = un exemple de titre est affiché.' })}
+      ${champ({ cle: 'coulisses', label: 'Coulisses de l’écriture', type: 'texte', valeur: v.coulisses, aide: 'L’histoire du livre, l’inspiration, la fabrication…' })}
+      ${champ({ cle: 'suite', label: 'Et après ?', type: 'texte', valeur: v.suite, aide: 'Une info par ligne (suite, adaptation…). La première répond aussi à « Y aura-t-il une suite ? ».' })}
       ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}`,
     valider: d => !d.titre ? 'Le titre est obligatoire' : !lienValide(d.lienAmazon) || !lienValide(d.lienCoolLibri) ? 'Les liens doivent commencer par https://' : '',
   });

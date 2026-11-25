@@ -343,3 +343,4 @@ body:has(.barre-enregistrer:not([hidden])) .toast{bottom:84px}
 .captures-g figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .captures-g img{width:100%;height:90px;object-fit:cover;display:block}.captures-g figure div{display:flex;justify-content:space-between;padding:2px}
 .captures-g .btn-icone{width:30px;height:30px}
+.sous-titre-form{font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:28px 0 4px;padding-top:22px;border-top:1px solid var(--ligne,#e3e0d8)}

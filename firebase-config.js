@@ -11,12 +11,12 @@
 // ============================================================
 
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyBzCUFWujkFe6FJU4pXfcb-TbDytCDR_ps",
+  authDomain: "kmauger-de247.firebaseapp.com",
+  projectId: "kmauger-de247",
+  storageBucket: "kmauger-de247.firebasestorage.app",
+  messagingSenderId: "554665577592",
+  appId: "1:554665577592:web:373f1895abfb9026cdf18d"
 };
 
 export const firebaseActif = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);

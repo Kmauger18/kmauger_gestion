@@ -1,44 +1,22 @@
-# Mise en service de Firebase (gratuit)
+# Firebase — état et premier démarrage
 
-L'espace de gestion fonctionne déjà en **mode démonstration** : on peut tout essayer, mais rien n'est envoyé sur le site. Pour le relier au site KMAUGER., il faut un projet Firebase. Compter environ 15 minutes.
+Projet Firebase : **KMAUGER** (`kmauger-de247`), formule **Spark (gratuite)**.
+Console : <https://console.firebase.google.com/project/kmauger-de247>
 
-Formule utilisée : **Spark (gratuite)**. Aucune carte bancaire n'est demandée. Les images sont enregistrées dans Firestore, pas dans Firebase Storage (qui demande la formule payante).
+Déjà fait :
+- configuration copiée dans `firebase-config.js` (ce dépôt et le dépôt `kmauger`) ;
+- connexion par e-mail/mot de passe activée ;
+- inscription libre **désactivée** (seuls les comptes créés dans la console ont accès) ;
+- domaine `kmauger18.github.io` autorisé ;
+- base Firestore créée en Europe (eur3), mode production, règles de [`firestore.rules`](firestore.rules) publiées.
 
-## 1. Créer le projet
+## Créer ton compte de connexion
 
-1. Aller sur <https://console.firebase.google.com> → **Créer un projet** → nom : `kmauger`.
-2. Google Analytics : inutile, on peut le désactiver.
-3. Dans le projet : icône **</>** (Ajouter une application Web) → surnom `KMAUGER site` → **Enregistrer** (ne pas cocher Hosting).
-4. Firebase affiche un bloc `firebaseConfig`. Copier les valeurs dans **`firebase-config.js`**, dans **les deux dépôts** :
-   - `kmauger_gestion/firebase-config.js`
-   - `kmauger/firebase-config.js`
+**Authentication → Users → Ajouter un utilisateur** → ton e-mail et un mot de passe. Chaque compte ajouté ici a accès à l'espace de gestion.
 
-## 2. Activer la connexion par e-mail
+Si tu modifies `firestore.rules`, recolle-le dans **Firestore Database → Règles → Publier**.
 
-1. Menu **Créer → Authentication → Commencer**.
-2. Onglet **Sign-in method** → **E-mail/Mot de passe** → activer seulement la première option → **Enregistrer**.
-
-## 3. Créer ton compte
-
-Onglet **Users** → **Ajouter un utilisateur** → adresse e-mail et mot de passe. Chaque compte ajouté ici a **automatiquement** accès à l'espace de gestion.
-
-## 4. Bloquer l'inscription libre (important)
-
-**Authentication → Paramètres → Actions de l'utilisateur** → **décocher « Activer la création (inscription) »** → Enregistrer.
-
-Sans cela, n'importe qui pourrait se créer un compte et modifier le site.
-
-## 5. Autoriser l'adresse GitHub Pages
-
-**Authentication → Paramètres → Domaines autorisés** → **Ajouter un domaine** → `kmauger18.github.io`.
-
-## 6. Créer la base de données
-
-1. Menu **Créer → Firestore Database → Créer une base de données**.
-2. Emplacement : **eur3 (Europe)**. Mode : **production** → **Créer**.
-3. Onglet **Règles** : remplacer tout le contenu par celui du fichier [`firestore.rules`](firestore.rules) → **Publier**.
-
-## 7. Premier démarrage
+## Premier démarrage
 
 1. Ouvrir l'espace de gestion : <https://kmauger18.github.io/kmauger_gestion/> et se connecter.
 2. Le tableau de bord indique « La base est vide » : cliquer sur **Importer le contenu du site**. Les textes, les liens, les 5 livres, les photos et les projets actuels arrivent dans la base.

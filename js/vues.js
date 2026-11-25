@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611251915';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611251915';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, TYPES_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611251915';
-import { SITE_URL } from '../firebase-config.js?v=202611251915';
+import * as S from './store.js?v=202611251924';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611251924';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, TYPES_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611251924';
+import { SITE_URL } from '../firebase-config.js?v=202611251924';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');

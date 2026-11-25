@@ -117,11 +117,11 @@ export const CHAMPS_LIENS = [
 // ---------------------------------------------------------------- Images du site
 export const IMAGES_SITE = [
   { cle: 'accueil_hero', label: 'Grande photo de l’accueil', page: 'Accueil', origine: U('photo-1497366754035-f200968a6e72', 1400) },
-  { cle: 'carte_livres', label: 'Carte « Livres »', page: 'Accueil', origine: U('photo-1512820790803-83ca734da794', 1000) },
+  { cle: 'carte_livres', label: 'Carte « Livres »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/carte-livres.jpg' },
   { cle: 'carte_photo', label: 'Carte « Photographie »', page: 'Accueil', origine: U('photo-1452587925148-ce544e77e70d', 1000) },
   { cle: 'carte_projets', label: 'Carte « Projets »', page: 'Accueil', origine: U('photo-1460925895917-afdab827c52f', 1000) },
   { cle: 'carte_cosplay', label: 'Carte « Cosplay »', page: 'Accueil', origine: U('photo-1531058020387-3be344556be6', 1000) },
-  { cle: 'livres_banniere', label: 'Bannière', page: 'Livres', origine: U('photo-1512820790803-83ca734da794', 1800) },
+  { cle: 'livres_banniere', label: 'Bannière', page: 'Livres', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/banniere-livres.jpg' },
   { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: U('photo-1470770841072-f978cf4d019e', 1800) },
   { cle: 'projets_banniere', label: 'Bannière', page: 'Projets', origine: U('photo-1460925895917-afdab827c52f', 1800) },
   { cle: 'cosplay_banniere', label: 'Bannière', page: 'Cosplay', origine: U('photo-1531058020387-3be344556be6', 1800) },

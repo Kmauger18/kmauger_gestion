@@ -1,6 +1,6 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611251915';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, PROJETS_ORIGINE } from './donnees.js?v=202611251915';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611251924';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, PROJETS_ORIGINE } from './donnees.js?v=202611251924';
 
 export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';

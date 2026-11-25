@@ -59,7 +59,7 @@ function nettoyer(obj) { return JSON.parse(JSON.stringify(obj)); }
 // =====================================================================
 //  MODE DÉMO
 // =====================================================================
-const CLE_DEMO = 'kmauger-gestion-demo-v1';
+const CLE_DEMO = 'kmauger-gestion-demo-v2';
 function contenuOrigine() {
   const d = Object.fromEntries(COLLECTIONS.map(c => [c, {}]));
   d.contenu = { textes: { ...TEXTES_ORIGINE }, liens: { ...LIENS_ORIGINE } };

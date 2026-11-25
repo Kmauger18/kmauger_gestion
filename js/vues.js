@@ -127,13 +127,13 @@ export const VUES = {
     rendre(el) {
       const l = S.liste('livres');
       el.innerHTML = `
-        <div class="barre"><p class="intro">L'ordre ici est celui de la page Livres du site.</p><button class="btn btn-primaire" id="ajout">${ic('plus')} Nouveau livre</button></div>
+        <div class="barre"><p class="intro">L'ordre ici est celui de la page Livres du site. Chaque livre a sa fiche détaillée sur le site.</p><button class="btn btn-primaire" id="ajout">${ic('plus')} Nouveau livre</button></div>
         ${l.length ? `<div class="galerie livres">${l.map((x, i) => `
           <figure class="photo ${x.visible === false ? 'masque' : ''}">
             <div class="photo-img portrait">${x.couverture ? `<img src="${esc(x.couverture)}" alt="" loading="lazy">` : `<div class="vide-img">${esc(x.titre)}</div>`}${etiquetteMasque(x)}</div>
             <figcaption><b>${esc(x.titre)}</b><small class="type">${esc([x.genre, STATUTS_LIVRE[x.statut]].filter(Boolean).join(' · '))}</small></figcaption>
             ${actions(x, i, l.length)}
-          </figure>`).join('')}</div>` : vide('Aucun livre', 'Ajoutez vos romans : couverture, résumé et lien d\'achat.')}`;
+          </figure>`).join('')}</div>` : vide('Aucun livre', 'Ajoutez vos romans : couverture, description et liens d\'achat.')}`;
       $('#ajout', el).onclick = () => formLivre();
       brancherListe(el, 'livres', { formulaire: formLivre, nom: x => x.titre });
     }
@@ -473,24 +473,31 @@ const lienValide = u => !u || /^https?:\/\//i.test(u);
 function formLivre(l = null) {
   formulaireAvecImage({
     id: 'fl', col: 'livres', element: l, titre: l ? 'Modifier le livre' : 'Nouveau livre',
-    defaut: { titre: '', genre: '', annee: '', statut: 'bientot', resume: '', lien: '', libelleLien: '', couverture: '', visible: true },
-    image: { cle: 'couverture', label: 'Couverture', portrait: true, largeur: 700, plafond: 200000 },
+    defaut: { titre: '', genre: '', statut: 'bientot', accroche: '', description: '', couverture: '', pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '', lienAmazon: '', lienCoolLibri: '', visible: true },
+    image: { cle: 'couverture', label: 'Couverture', portrait: true, largeur: 800, plafond: 260000 },
     corps: v => `
       ${champ({ cle: 'titre', label: 'Titre', valeur: v.titre, requis: true })}
       <div class="grille-champs">
         ${champ({ cle: 'genre', label: 'Genre', valeur: v.genre, placeholder: 'Ex. : Urban fantasy' })}
-        ${champ({ cle: 'annee', label: 'Année de parution', valeur: v.annee, placeholder: 'Ex. : 2026' })}
-      </div>
-      ${champ({ cle: 'resume', label: 'Résumé', type: 'texte', valeur: v.resume, aide: 'Une ligne vide entre deux paragraphes crée un nouveau paragraphe.' })}
-      <div class="grille-champs">
-        ${champ({ cle: 'lien', label: 'Lien d\'achat (facultatif)', valeur: v.lien, placeholder: 'https://…' })}
-        ${champ({ cle: 'libelleLien', label: 'Texte du bouton', valeur: v.libelleLien, placeholder: 'Se procurer le livre' })}
-      </div>
-      <div class="grille-champs">
         ${champ({ cle: 'statut', label: 'Statut', type: 'select', valeur: v.statut, options: STATUTS_LIVRE })}
-        <div class="champ champ-case">${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}</div>
-      </div>`,
-    valider: d => !d.titre ? 'Le titre est obligatoire' : !lienValide(d.lien) ? 'Le lien doit commencer par https://' : '',
+      </div>
+      ${champ({ cle: 'accroche', label: 'Accroche (liste des livres)', valeur: v.accroche, placeholder: 'Une phrase courte' })}
+      ${champ({ cle: 'description', label: 'Description (fiche du livre)', type: 'texte', valeur: v.description, aide: 'Une ligne vide = nouveau paragraphe. *mot* = italique.' })}
+      <div class="grille-champs">
+        ${champ({ cle: 'lienAmazon', label: 'Lien Amazon', valeur: v.lienAmazon, placeholder: 'https://www.amazon.fr/…' })}
+        ${champ({ cle: 'lienCoolLibri', label: 'Lien CoolLibri', valeur: v.lienCoolLibri, placeholder: 'https://www.coollibri.com/…' })}
+      </div>
+      <p class="aide">Les boutons d'achat n'apparaissent que si un lien est rempli ; sans lien, la fiche affiche « Bientôt disponible ».</p>
+      <div class="grille-champs">
+        ${champ({ cle: 'pages', label: 'Nombre de pages', valeur: v.pages })}
+        ${champ({ cle: 'format', label: 'Format', valeur: v.format })}
+        ${champ({ cle: 'dateParution', label: 'Date de parution', valeur: v.dateParution, placeholder: 'Ex. : 29 octobre 2026' })}
+        ${champ({ cle: 'isbn', label: 'ISBN', valeur: v.isbn })}
+        ${champ({ cle: 'langue', label: 'Langue', valeur: v.langue })}
+        ${champ({ cle: 'prix', label: 'Prix (facultatif)', valeur: v.prix, placeholder: 'Ex. : 14,08 €' })}
+      </div>
+      ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}`,
+    valider: d => !d.titre ? 'Le titre est obligatoire' : !lienValide(d.lienAmazon) || !lienValide(d.lienCoolLibri) ? 'Les liens doivent commencer par https://' : '',
   });
 }
 

@@ -133,13 +133,50 @@ export const STATUTS_LIVRE = { disponible: 'Disponible', bientot: 'Bientôt', ec
 export const TYPES_PROJET = { site: 'Site web', application: 'Application', jeu: 'Jeu', autre: 'Autre' };
 export const CATEGORIES_PHOTO = { paysages: 'Paysages', lumieres: 'Lumières', atmospheres: 'Atmosphères', portraits: 'Portraits', macro: 'Macro', urbain: 'Urbain', autres: 'Autres' };
 
+const IMG = 'https://kmauger18.github.io/kmauger/assets/img/livres/';
 export const LIVRES_ORIGINE = [
-  { titre: 'L’encre du dernier jour', genre: 'Roman', annee: '', statut: 'disponible', resume: 'Disponible en format poche sur CoolLibri et Amazon.', lien: '', libelleLien: '', couverture: '', visible: true, ordre: 1 },
-  { titre: 'De l’autre côté du sort', genre: 'Urban fantasy', annee: '', statut: 'bientot', resume: '', lien: '', libelleLien: '', couverture: '', visible: true, ordre: 2 },
-  { titre: 'Ce qu’on ne se dit pas encore', genre: 'Romance young adult', annee: '', statut: 'bientot', resume: '', lien: '', libelleLien: '', couverture: '', visible: true, ordre: 3 },
-  { titre: 'Distribué, jamais lu', genre: 'Roman', annee: '', statut: 'bientot', resume: '', lien: '', libelleLien: '', couverture: '', visible: true, ordre: 4 },
-  { titre: '08:14 Point de rupture', genre: 'Roman', annee: '', statut: 'bientot', resume: '', lien: '', libelleLien: '', couverture: '', visible: true, ordre: 5 },
+  {
+    titre: 'L’encre du dernier jour', genre: 'Thriller psychologique', statut: 'disponible',
+    accroche: 'Il existe des morts que personne n’a vu venir.',
+    description: 'Il existe des morts que personne n’a vu venir.\nArthur souriait. Arthur écrivait. Arthur s’est tu.\n\nLe jour de ses funérailles, sous la pluie de Rennes, Aurore reçoit un livre et une lettre. Une seule phrase l’empêche de tourner la page : *ce que l’on cherche n’est pas caché dans ce que l’on lit, mais dans ce que l’on ne remarque pas.*\n\nAu lycée, les silences se fissurent. Un procès. Une salle de théâtre. Une cérémonie. Un compte sans nom qui publie chaque nuit à 3 h 12. Ceux qui ont blessé Arthur, et ceux qui ont choisi de ne rien dire, tombent un à un. À chaque fois, un lys blanc, la tige coupée en biais.\n\nIci, chaque mot laisse une trace.\nChaque silence a un prix.\nEt chaque page rapproche d’une vérité que personne ne voulait lire.',
+    couverture: IMG + 'lencre-du-dernier-jour.jpg',
+    pages: '455', format: 'Poche · 11 × 17 cm', dateParution: '29 octobre 2026', isbn: '979-8166225740', langue: 'Français', prix: '',
+    lienAmazon: 'https://www.amazon.fr/dp/B0HPY7LDP6', lienCoolLibri: '', visible: true, ordre: 1,
+  },
+  {
+    titre: 'De l’autre côté du sort', genre: 'Urban fantasy', statut: 'bientot',
+    accroche: 'Elle maîtrise l’ombre. Il ne croit qu’à l’acier.',
+    description: '*Elle maîtrise l’ombre. Il ne croit qu’à l’acier.*\n\nVespera est une sorcière de magie noire traquée par le Conseil. Julian est un chasseur sans magie, immunisé contre tous les sortilèges.\n\nLorsque leur affrontement révèle une trahison bien plus sombre, le chasseur et sa proie n’ont plus qu’un choix : s’allier ou périr.\n\n*Attention : ce grimoire est vivant.*',
+    couverture: IMG + 'de-lautre-cote-du-sort.jpg',
+    pages: '296', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '',
+    lienAmazon: '', lienCoolLibri: '', visible: true, ordre: 2,
+  },
+  {
+    titre: 'Ce qu’on ne se dit pas encore', genre: 'Romance young adult', statut: 'bientot',
+    accroche: 'Aux yeux de tout le lycée, Léo et Camille forment le couple parfait.',
+    description: 'Aux yeux de tout le lycée, Léo et Camille forment le couple parfait.\n\nPourtant, derrière les sourires, chacun cache un secret qui bouleverse tout ce qu’il croyait savoir de lui-même.\n\nLéo tombe amoureux d’un garçon.\nCamille tombe amoureuse d’une fille.\n\nAvant d’affronter le regard des autres, ils devront trouver le courage de se dire la vérité — et de se choisir comme alliés.',
+    couverture: IMG + 'ce-quon-ne-se-dit-pas-encore.jpg',
+    pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '',
+    lienAmazon: '', lienCoolLibri: '', visible: true, ordre: 3,
+  },
+  {
+    titre: 'Distribué, jamais lu', genre: 'Comédie romantique', statut: 'bientot',
+    accroche: '30 jours. 3 règles. 0 photo.',
+    description: '*02 h 14.* Chloé, fleuriste un brin gaffeuse, envoie un message à sa meilleure amie… au mauvais numéro. À l’autre bout, Mathis, pâtissier insomniaque, répond au lieu de bloquer.\n\nTrois règles : pas de prénoms, pas de photos, pas de rencontre avant trente jours.\n\nCe qu’ils ignorent ? Ils vivent dans le même immeuble, travaillent face à face… et chacun confie à l’autre son béguin pour l’autre.\n\nUne comédie romantique racontée entièrement en SMS, où un simple « Distribué » peut tout faire basculer.',
+    couverture: IMG + 'distribue-jamais-lu.jpg',
+    pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '',
+    lienAmazon: '', lienCoolLibri: '', visible: true, ordre: 4,
+  },
+  {
+    titre: '08:14 Point de rupture', genre: 'Thriller', statut: 'bientot',
+    accroche: 'Deux ennemis. Quatorze minutes.',
+    description: '08:00. Le train quitte la gare.\n08:14. Tout explose.\nPuis le temps revient à zéro.\n\nSeuls deux passagers se souviennent.\nNolan veut sauver tout le monde.\nSora doit s’assurer que la bombe explose.\n\nDeux ennemis. Quatorze minutes.\nUne seule vérité, selon le filtre que vous choisissez.\n\n*Un filtre rouge, un filtre cyan : deux lectures.*',
+    couverture: IMG + '08h14-point-de-rupture.jpg',
+    pages: '', format: 'Poche · 11 × 17 cm', dateParution: '', isbn: '', langue: 'Français', prix: '',
+    lienAmazon: '', lienCoolLibri: '', visible: true, ordre: 5,
+  },
 ];
+
 export const PHOTOS_ORIGINE = [
   { legende: 'Paysages', categorie: 'paysages', apercu: U('photo-1470770841072-f978cf4d019e', 900), hd: false, visible: true, ordre: 1 },
   { legende: 'Lumières', categorie: 'lumieres', apercu: U('photo-1490730141103-6cac27aaab94', 900), hd: false, visible: true, ordre: 2 },

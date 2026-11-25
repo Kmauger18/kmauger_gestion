@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611252005';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252005';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252005';
-import { SITE_URL } from '../firebase-config.js?v=202611252005';
+import * as S from './store.js?v=202611252006';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252006';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252006';
+import { SITE_URL } from '../firebase-config.js?v=202611252006';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -84,6 +84,10 @@ export const VUES = {
         <div class="carte carte-alerte">
           <div><h3>La base est vide</h3><p>Le site affiche encore son contenu d'origine. Importez-le dans la base pour pouvoir le modifier d'ici.</p></div>
           <button class="btn btn-primaire" id="importer">${ic('telecharger')} Importer le contenu du site</button>
+        </div>` : S.mode === 'firebase' && S.chargementTermine() && S.projetsAImporter() ? `
+        <div class="carte carte-alerte">
+          <div><h3>Nouveaux projets à importer</h3><p>Les projets numériques (Normandy Soldiers Memory, Juste une part merci !, Mijote, PitWall, Clé de 12) ne sont pas encore dans la base. Le site les affiche quand même en attendant.</p></div>
+          <button class="btn btn-primaire" id="importer">${ic('telecharger')} Importer les projets</button>
         </div>` : ''}
         <div class="tuiles t5">
           <a class="tuile" href="#livres"><span>${ic('livre')}</span><b>${visibles(livres)}</b><small>Livres en ligne</small></a>

@@ -1,6 +1,6 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252005';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252005';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252006';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252006';
 
 export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
@@ -52,6 +52,7 @@ export function obtenir(col, id) { const v = db[col][id]; return v ? { id, ...v 
 export function textes() { return { ...TEXTES_ORIGINE, ...(db.contenu.textes || {}) }; }
 export function liens() { return { ...LIENS_ORIGINE, ...(db.contenu.liens || {}) }; }
 export function image(cle) { return db.images[cle]?.data || ''; }
+export function projetsAImporter() { return Object.keys(db.projets).length > 0 && !Object.keys(db.realisations).length; }
 export function baseVide() { return !Object.keys(db.contenu).length && !Object.keys(db.livres).length && !Object.keys(db.photos).length; }
 
 function idAleatoire() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); }
@@ -236,8 +237,18 @@ export async function importerOrigine({ ecraser = false } = {}) {
   if (ecraser || !db.contenu.textes) set('contenu', 'textes', TEXTES_ORIGINE);
   if (ecraser || !db.contenu.liens) set('contenu', 'liens', LIENS_ORIGINE);
   if (ecraser || !Object.keys(db.livres).length) LIVRES_ORIGINE.forEach((e, i) => set('livres', 'origine' + i, e));
-  if (ecraser || !Object.keys(db.projets).length) CATEGORIES_ORIGINE.forEach(({ id, ...e }) => set('projets', id, e));
-  if (ecraser || !Object.keys(db.realisations).length) REALISATIONS_ORIGINE.forEach((e, i) => set('realisations', 'origine' + i, e));
+  // Catégories : reprend celles qui existent déjà (même nom), crée les autres
+  const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  const idCat = {};
+  CATEGORIES_ORIGINE.forEach(({ id, ...e }) => {
+    const exist = Object.entries(db.projets).find(([, c]) => norm(c.titre) === norm(e.titre));
+    if (exist && !ecraser) {
+      idCat[id] = exist[0];
+      // Ancienne image d'exemple : remplacée par la nouvelle
+      if (/images\.unsplash\.com\/photo-(1559028012|1551650975)/.test(exist[1].image || '')) ops.push({ type: 'merge', col: 'projets', id: exist[0], data: { image: e.image } });
+    } else { idCat[id] = exist ? exist[0] : id; set('projets', idCat[id], e); }
+  });
+  if (ecraser || !Object.keys(db.realisations).length) REALISATIONS_ORIGINE.forEach((e, i) => set('realisations', 'origine' + i, { ...e, categorie: idCat[e.categorie] || e.categorie }));
   const deja = new Set(Object.values(db.photos).map(p => p.apercu));
   PHOTOS_ORIGINE.forEach((p, i) => { if (!deja.has(p.apercu)) set('photos', 'origine' + i, { ...p, ajouteLe: Date.now() }); });
   if (!ops.length) return 0;

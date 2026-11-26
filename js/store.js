@@ -1,6 +1,6 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611260822';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, ALBUMS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611260822';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611261850';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, ALBUMS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611261850';
 
 export const COLLECTIONS = ['contenu', 'images', 'livres', 'albums', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
@@ -285,7 +285,7 @@ const ANCIENS_TEXTES = {
   accueil_image_tag: ['KMAUGER. — Creative universe', 'KMAUGER. — Univers créatif'],
   contact_bloc_titre: ['Let’s create\nsomething.', 'Créons quelque\nchose ensemble.'],
 };
-const VERSION_MAJ = 3;
+const VERSION_MAJ = 4;
 const CHAMPS_FICHE = ['lieu', 'themes', 'personnages', 'indices', 'extrait', 'citations', 'musique', 'playlist', 'coulisses', 'suite'];
 export async function miseAJourContenu() {
   if (!chargementTermine() || !db.contenu.liens || (db.contenu.liens.majContenu || 0) >= VERSION_MAJ) return 0;
@@ -316,6 +316,34 @@ export async function miseAJourContenu() {
     if (opsAlbums.length) { try { await lot(opsAlbums); } catch (e) { console.warn('Album non créé (règles Firestore ?)', e); version = 2; } }
   }
   if (t && t.photo_themes_eyebrow !== undefined && t.photo_raccourcis_eyebrow === undefined) ops.push({ type: 'merge', col: 'contenu', id: 'textes', data: { photo_raccourcis_eyebrow: 'Albums' } });
+  // v4 : Scriptorium ajouté aux sites web ; Mijote en ligne (version web + APK Android)
+  if ((db.contenu.liens.majContenu || 0) < 4) {
+    const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const reals = Object.entries(db.realisations);
+    const origine = titre => REALISATIONS_ORIGINE.find(x => norm(x.titre) === norm(titre));
+    const sc = origine('Scriptorium');
+    if (sc && !reals.some(([, x]) => norm(x.titre) === 'scriptorium')) {
+      const catOrigine = CATEGORIES_ORIGINE.find(c => c.id === sc.categorie);
+      const cat = Object.entries(db.projets).find(([, c]) => norm(c.titre) === norm(catOrigine?.titre))?.[0];
+      if (cat) {
+        const ordre = Math.max(0, ...reals.filter(([, x]) => x.categorie === cat).map(([, x]) => Number(x.ordre) || 0)) + 1;
+        ops.push({ type: 'set', col: 'realisations', id: 'origine-scriptorium', data: { ...sc, categorie: cat, ordre } });
+      }
+    }
+    const mij = origine('Mijote'), doc = reals.find(([, x]) => norm(x.titre) === 'mijote');
+    if (mij && doc) {
+      const [id, x] = doc, champs = {};
+      // N'écrase que ce qui n'a pas été personnalisé
+      if (!x.lien) Object.assign(champs, { lien: mij.lien, libelleLien: mij.libelleLien });
+      if (!x.lien2) Object.assign(champs, { lien2: mij.lien2, libelleLien2: mij.libelleLien2 });
+      if (x.statut === 'beta') champs.statut = mij.statut;
+      if (x.plateforme === 'Android') champs.plateforme = mij.plateforme;
+      if (x.technologies === 'HTML, CSS, JavaScript, Capacitor') champs.technologies = mij.technologies;
+      if (/1 187 recettes/.test(x.points || '')) champs.points = mij.points;
+      if (/Plus de 1 100 recettes/.test(x.description || '')) champs.description = mij.description;
+      if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'realisations', id, data: champs });
+    }
+  }
   const unsplash = v => /images\.unsplash\.com/.test(v || '');
   for (const [id, p] of Object.entries(db.photos)) if (unsplash(p.apercu) && p.visible !== false) ops.push({ type: 'merge', col: 'photos', id, data: { visible: false } });
   const jeux = CATEGORIES_ORIGINE.find(c => c.id === 'jeux');

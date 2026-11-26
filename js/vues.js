@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611260822';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611260822';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611260822';
-import { SITE_URL } from '../firebase-config.js?v=202611260822';
+import * as S from './store.js?v=202611261850';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611261850';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611261850';
+import { SITE_URL } from '../firebase-config.js?v=202611261850';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -643,7 +643,7 @@ async function deplacerDans(id, sens, cat) {
 
 function formRealisation(r = null, categorieDefaut = '') {
   const cats = S.liste('projets');
-  const v = r || { titre: '', categorie: categorieDefaut || cats[0]?.id || '', statut: 'en-ligne', annee: String(new Date().getFullYear()), accroche: '', description: '', points: '', plateforme: '', technologies: '', lien: '', libelleLien: '', image: '', captures: [], visible: true };
+  const v = r || { titre: '', categorie: categorieDefaut || cats[0]?.id || '', statut: 'en-ligne', annee: String(new Date().getFullYear()), accroche: '', description: '', points: '', plateforme: '', technologies: '', lien: '', libelleLien: '', lien2: '', libelleLien2: '', image: '', captures: [], visible: true };
   const ci = champImage({ valeur: v.image, label: 'Image principale', largeur: 1400, plafond: 230000 });
   let captures = [...(v.captures || [])];
   const MAX = 6;
@@ -665,6 +665,8 @@ function formRealisation(r = null, categorieDefaut = '') {
         ${champ({ cle: 'annee', label: 'Année', valeur: v.annee })}
         ${champ({ cle: 'lien', label: 'Lien (facultatif)', valeur: v.lien, placeholder: 'https://…' })}
         ${champ({ cle: 'libelleLien', label: 'Texte du bouton', valeur: v.libelleLien, placeholder: 'Voir le site' })}
+        ${champ({ cle: 'lien2', label: 'Second lien (facultatif)', valeur: v.lien2, placeholder: 'https://… (ex. : APK à télécharger)' })}
+        ${champ({ cle: 'libelleLien2', label: 'Texte du second bouton', valeur: v.libelleLien2, placeholder: 'Télécharger l’APK' })}
       </div>
       <div class="champ"><label>Captures d'écran (${MAX} au maximum)</label><div class="captures-g" data-caps></div>
         <label class="btn btn-clair" style="justify-self:start">${ic('televerser')} Ajouter des captures<input type="file" accept="image/*" multiple data-caps-fichiers hidden></label>
@@ -693,7 +695,7 @@ function formRealisation(r = null, categorieDefaut = '') {
         ev.preventDefault();
         const d = { ...lireFormulaire(ev.target), image: ci.lire(), captures };
         if (!d.titre) return toast('Le nom est obligatoire', 'erreur');
-        if (!lienValide(d.lien)) return toast('Le lien doit commencer par https://', 'erreur');
+        if (!lienValide(d.lien) || !lienValide(d.lien2)) return toast('Les liens doivent commencer par https://', 'erreur');
         try {
           if (r) {
             const changeCat = r.categorie !== d.categorie;

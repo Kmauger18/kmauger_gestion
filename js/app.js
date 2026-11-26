@@ -1,11 +1,11 @@
 // Démarrage, connexion, navigation
-import * as S from './store.js?v=202611252109';
-import { VUES } from './vues.js?v=202611252109';
-import { $, $$, esc, ic, toast, fermerFenetre } from './ui.js?v=202611252109';
-import { SITE_URL } from '../firebase-config.js?v=202611252109';
+import * as S from './store.js?v=202611260822';
+import { VUES } from './vues.js?v=202611260822';
+import { $, $$, esc, ic, toast, fermerFenetre } from './ui.js?v=202611260822';
+import { SITE_URL } from '../firebase-config.js?v=202611260822';
 
 const MENU = [
-  ['tableau'], ['—', 'Mes univers'], ['livres'], ['photos'], ['realisations'], ['categories'], ['cosplays'],
+  ['tableau'], ['—', 'Mes univers'], ['livres'], ['albums'], ['photos'], ['realisations'], ['categories'], ['cosplays'],
   ['—', 'Le site'], ['textes'], ['images'], ['liens'], ['parametres'],
 ];
 

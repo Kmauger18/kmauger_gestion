@@ -75,7 +75,10 @@ export const TEXTES_ORIGINE = {
   livres_ou_texte: "Mes romans paraissent au format poche (11 × 17 cm). Chaque fiche indique où se les procurer, et les prochains arrivent au fil des mois.",
   photo_edito_eyebrow: "Mon regard",
   photo_edito: "Paysages, lumières, détails du quotidien : je photographie ce qui m’arrête, en cherchant la bonne lumière et le bon angle. Une galerie qui s’enrichit au fil de mes sorties.",
-  photo_themes_eyebrow: "Thèmes",
+  photo_raccourcis_eyebrow: "Albums",
+  photo_albums_eyebrow: "Portfolios",
+  photo_albums_titre: "Les albums",
+  photo_albums_intro: "Chaque album est une série : une séance, un lieu, une histoire. Ouvre-en un pour le parcourir en grand.",
   photo_insta_texte: "Retrouve mes dernières photos sur Instagram.",
   projets_une_eyebrow: "Projet à la une",
   projets_methode_eyebrow: "Méthode",
@@ -149,8 +152,9 @@ export const PAGES_TEXTES = [
   ], note: 'Les livres eux-mêmes se gèrent dans l’écran « Livres ».', lienNote: '#livres' },
   { id: 'photographie', titre: 'Photographie', ancre: 'photographie/', zones: [
     { titre: 'Haut de page', champs: ENTETE('photo') },
-    { titre: 'Galerie', champs: [c('photo_section_eyebrow', 'Petit titre', 'ligne'), c('photo_section_titre', 'Titre', 'ligne')] },
-    { titre: 'Mon regard', champs: [c('photo_edito_eyebrow', 'Petit titre', 'ligne'), c('photo_edito', 'Texte', 'texte'), c('photo_themes_eyebrow', 'Titre des thèmes', 'ligne')] },
+    { titre: 'Albums', champs: [c('photo_albums_eyebrow', 'Petit titre', 'ligne'), c('photo_albums_titre', 'Titre', 'ligne'), c('photo_albums_intro', 'Introduction', 'texte')] },
+    { titre: 'Photos hors album', champs: [c('photo_section_eyebrow', 'Petit titre', 'ligne'), c('photo_section_titre', 'Titre', 'ligne')] },
+    { titre: 'Mon regard', champs: [c('photo_edito_eyebrow', 'Petit titre', 'ligne'), c('photo_edito', 'Texte', 'texte'), c('photo_raccourcis_eyebrow', 'Titre des raccourcis vers les albums', 'ligne')] },
     { titre: 'Instagram', champs: [c('photo_insta_texte', 'Texte', 'ligne')] },
   ], note: 'Les photos se gèrent dans l’écran « Photographie ».', lienNote: '#photos' },
   { id: 'projets', titre: 'Projets', ancre: 'projets/', zones: [
@@ -200,7 +204,7 @@ export const IMAGES_SITE = [
   { cle: 'carte_projets', label: 'Carte « Projets »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/carte-projets.jpg' },
   { cle: 'carte_cosplay', label: 'Carte « Cosplay »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/carte-cosplay.webp' },
   { cle: 'livres_banniere', label: 'Bannière', page: 'Livres', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/banniere-livres.jpg' },
-  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/banniere-photo.webp' },
+  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: 'https://kmauger18.github.io/kmauger/assets/img/photos/st-line/02.webp' },
   { cle: 'projets_banniere', label: 'Bannière', page: 'Projets', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/banniere-projets.jpg' },
   { cle: 'cosplay_banniere', label: 'Bannière', page: 'Cosplay', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/banniere-cosplay.webp' },
   { cle: 'apropos_portrait', label: 'Portrait (à la place du logo)', page: 'À propos', origine: 'img/logo.png' },
@@ -208,7 +212,7 @@ export const IMAGES_SITE = [
 
 // ---------------------------------------------------------------- Listes
 export const STATUTS_LIVRE = { disponible: 'Disponible', bientot: 'Bientôt', ecriture: 'En écriture' };
-export const CATEGORIES_PHOTO = { paysages: 'Paysages', lumieres: 'Lumières', atmospheres: 'Atmosphères', portraits: 'Portraits', macro: 'Macro', urbain: 'Urbain', autres: 'Autres' };
+export const CATEGORIES_PHOTO = { paysages: 'Paysages', lumieres: 'Lumières', atmospheres: 'Atmosphères', portraits: 'Portraits', automobile: 'Automobile', macro: 'Macro', urbain: 'Urbain', autres: 'Autres' };
 
 const IMG = 'https://kmauger18.github.io/kmauger/assets/img/livres/';
 export const LIVRES_ORIGINE = [
@@ -264,7 +268,25 @@ export const LIVRES_ORIGINE = [
   },
 ];
 
+const IMG_ST = 'https://kmauger18.github.io/kmauger/assets/img/photos/st-line/';
+export const ALBUMS_ORIGINE = [
+  { id: 'st-line', titre: 'ST-Line', sousTitre: 'Une Fiesta, une lumière d’automne',
+    description: 'Une séance photo autour d’une Ford Fiesta ST-Line, entre portraits et détails : le rétroviseur, le badge, les clés, la jante.\n\nUne lumière d’automne, des feuilles au sol, un ciel très bleu et une carrosserie bleu nuit qui accroche chaque reflet.',
+    date: 'Automne 2026', lieu: '', modele: 'Éléa', lienModele: '', couverture: IMG_ST + '01.webp', partage: IMG_ST + 'partage.jpg', ordre: 1, visible: true },
+];
 export const PHOTOS_ORIGINE = [
+  { album: 'st-line', legende: "Lumière d’automne", categorie: 'portraits', apercu: IMG_ST + '01-m.webp', hdUrl: IMG_ST + '01.webp', ratio: 0.665, ordre: 1, visible: true },
+  { album: 'st-line', legende: "Dans les feuilles", categorie: 'automobile', apercu: IMG_ST + '02-m.webp', hdUrl: IMG_ST + '02.webp', ratio: 1.503, ordre: 2, visible: true },
+  { album: 'st-line', legende: "Face à face", categorie: 'automobile', apercu: IMG_ST + '03-m.webp', hdUrl: IMG_ST + '03.webp', ratio: 0.665, ordre: 3, visible: true },
+  { album: 'st-line', legende: "Ciel bleu, capot bleu nuit", categorie: 'portraits', apercu: IMG_ST + '04-m.webp', hdUrl: IMG_ST + '04.webp', ratio: 0.665, ordre: 4, visible: true },
+  { album: 'st-line', legende: "Fiesta ST", categorie: 'automobile', apercu: IMG_ST + '05-m.webp', hdUrl: IMG_ST + '05.webp', ratio: 0.665, ordre: 5, visible: true },
+  { album: 'st-line', legende: "Prendre le volant", categorie: 'portraits', apercu: IMG_ST + '06-m.webp', hdUrl: IMG_ST + '06.webp', ratio: 1.503, ordre: 6, visible: true },
+  { album: 'st-line', legende: "Dans le rétroviseur", categorie: 'portraits', apercu: IMG_ST + '07-m.webp', hdUrl: IMG_ST + '07.webp', ratio: 1.504, ordre: 7, visible: true },
+  { album: 'st-line', legende: "Les clés", categorie: 'portraits', apercu: IMG_ST + '08-m.webp', hdUrl: IMG_ST + '08.webp', ratio: 0.665, ordre: 8, visible: true },
+  { album: 'st-line', legende: "Porte-clés miniature", categorie: 'automobile', apercu: IMG_ST + '09-m.webp', hdUrl: IMG_ST + '09.webp', ratio: 1.504, ordre: 9, visible: true },
+  { album: 'st-line', legende: "Badge ST-Line", categorie: 'automobile', apercu: IMG_ST + '10-m.webp', hdUrl: IMG_ST + '10.webp', ratio: 1.504, ordre: 10, visible: true },
+  { album: 'st-line', legende: "Habitacle", categorie: 'automobile', apercu: IMG_ST + '11-m.webp', hdUrl: IMG_ST + '11.webp', ratio: 0.665, ordre: 11, visible: true },
+  { album: 'st-line', legende: "Jante", categorie: 'automobile', apercu: IMG_ST + '12-m.webp', hdUrl: IMG_ST + '12.webp', ratio: 1.503, ordre: 12, visible: true },
 ];
 const IMG_P = 'https://kmauger18.github.io/kmauger/assets/img/projets/';
 export const CATEGORIES_ORIGINE = [

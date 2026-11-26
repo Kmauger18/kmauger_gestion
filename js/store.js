@@ -1,12 +1,13 @@
 // Couche de données : Firebase (Firestore + Authentication) ou mode démo (navigateur)
-import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611252109';
-import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611252109';
+import { firebaseConfig, firebaseActif, FIREBASE_SDK } from '../firebase-config.js?v=202611260822';
+import { TEXTES_ORIGINE, LIENS_ORIGINE, LIVRES_ORIGINE, PHOTOS_ORIGINE, ALBUMS_ORIGINE, CATEGORIES_ORIGINE, REALISATIONS_ORIGINE } from './donnees.js?v=202611260822';
 
-export const COLLECTIONS = ['contenu', 'images', 'livres', 'photos', 'projets', 'realisations', 'cosplays'];
+export const COLLECTIONS = ['contenu', 'images', 'livres', 'albums', 'photos', 'projets', 'realisations', 'cosplays'];
 export const mode = firebaseActif ? 'firebase' : 'demo';
 
 // Données en mémoire : { livres: { id: {...} }, ... }
 export const db = Object.fromEntries(COLLECTIONS.map(c => [c, {}]));
+export let albumsBloques = false;
 const abonnes = new Set();
 let notifPrevue = false;
 function notifier() {
@@ -66,6 +67,7 @@ function contenuOrigine() {
   const d = Object.fromEntries(COLLECTIONS.map(c => [c, {}]));
   d.contenu = { textes: { ...TEXTES_ORIGINE }, liens: { ...LIENS_ORIGINE } };
   LIVRES_ORIGINE.forEach((e, i) => d.livres['liv' + i] = { ...e });
+  ALBUMS_ORIGINE.forEach(({ id, ...e }) => d.albums[id] = e);
   PHOTOS_ORIGINE.forEach((e, i) => d.photos['pho' + i] = { ...e });
   CATEGORIES_ORIGINE.forEach(({ id, ...e }) => d.projets[id] = e);
   REALISATIONS_ORIGINE.forEach((e, i) => d.realisations['rea' + i] = { ...e });
@@ -120,7 +122,11 @@ function ecouterTout() {
     premiersChargements.add(c);
     if (erreurLecture) erreurLecture = null;
     notifier();
-  }, err => { console.error('Lecture ' + c, err); erreurLecture = err; premiersChargements.add(c); notifier(); }));
+  }, err => {
+    // Albums : collection récente, peut-être pas encore autorisée dans les règles Firestore
+    if (c === 'albums') { console.warn('Albums non lisibles (règles Firestore à publier)', err); db.albums = {}; albumsBloques = true; premiersChargements.add(c); notifier(); return; }
+    console.error('Lecture ' + c, err); erreurLecture = err; premiersChargements.add(c); notifier();
+  }));
 }
 
 // =====================================================================
@@ -249,11 +255,26 @@ export async function importerOrigine({ ecraser = false } = {}) {
     } else { idCat[id] = exist ? exist[0] : id; set('projets', idCat[id], e); }
   });
   if (ecraser || !Object.keys(db.realisations).length) REALISATIONS_ORIGINE.forEach((e, i) => set('realisations', 'origine' + i, { ...e, categorie: idCat[e.categorie] || e.categorie }));
-  const deja = new Set(Object.values(db.photos).map(p => p.apercu));
-  PHOTOS_ORIGINE.forEach((p, i) => { if (!deja.has(p.apercu)) set('photos', 'origine' + i, { ...p, ajouteLe: Date.now() }); });
+  ajouterAlbumsOrigine(ops);
   if (!ops.length) return 0;
   await lot(ops);
   return ops.length;
+}
+
+// Albums photo d'origine et leurs photos : ajoutés s'ils manquent (même titre / même image)
+function ajouterAlbumsOrigine(ops) {
+  const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  const idAlbum = {};
+  ALBUMS_ORIGINE.forEach(({ id, ...a }) => {
+    const exist = Object.entries(db.albums).find(([, x]) => norm(x.titre) === norm(a.titre));
+    if (exist) idAlbum[id] = exist[0];
+    else { idAlbum[id] = id; ops.push({ type: 'set', col: 'albums', id, data: a }); }
+  });
+  const deja = new Set(Object.values(db.photos).map(p => p.apercu));
+  PHOTOS_ORIGINE.forEach((p, i) => {
+    if (deja.has(p.apercu)) return;
+    ops.push({ type: 'set', col: 'photos', id: `origine-${p.album || 'photo'}-${String(i + 1).padStart(2, '0')}`, data: { ...p, album: idAlbum[p.album] || p.album || '', ajouteLe: Date.now() } });
+  });
 }
 
 // ---------- Mise à jour automatique (une fois, à l'ouverture) ----------
@@ -264,7 +285,7 @@ const ANCIENS_TEXTES = {
   accueil_image_tag: ['KMAUGER. — Creative universe', 'KMAUGER. — Univers créatif'],
   contact_bloc_titre: ['Let’s create\nsomething.', 'Créons quelque\nchose ensemble.'],
 };
-const VERSION_MAJ = 2;
+const VERSION_MAJ = 3;
 const CHAMPS_FICHE = ['lieu', 'themes', 'personnages', 'indices', 'extrait', 'citations', 'musique', 'playlist', 'coulisses', 'suite'];
 export async function miseAJourContenu() {
   if (!chargementTermine() || !db.contenu.liens || (db.contenu.liens.majContenu || 0) >= VERSION_MAJ) return 0;
@@ -276,7 +297,7 @@ export async function miseAJourContenu() {
     if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'contenu', id: 'textes', data: champs });
   }
   const l = db.contenu.liens;
-  ops.push({ type: 'merge', col: 'contenu', id: 'liens', data: { majContenu: VERSION_MAJ, ...(String(l.email || '').trim() || (l.majContenu || 0) >= 1 ? {} : { email: LIENS_ORIGINE.email }) } });
+  ops.push({ type: 'merge', col: 'contenu', id: 'liens', data: { majContenu: version, ...(String(l.email || '').trim() || (l.majContenu || 0) >= 1 ? {} : { email: LIENS_ORIGINE.email }) } });
   // v2 : contenu de la fiche détaillée pour les livres d'origine (champs encore absents seulement)
   const normTitre = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, '').toLowerCase().trim();
   for (const [id, liv] of Object.entries(db.livres)) {
@@ -285,6 +306,16 @@ export async function miseAJourContenu() {
     const champs = Object.fromEntries(CHAMPS_FICHE.filter(k => o[k] && liv[k] === undefined).map(k => [k, o[k]]));
     if (Object.keys(champs).length) ops.push({ type: 'merge', col: 'livres', id, data: champs });
   }
+  // v3 : albums photo (ST-Line). L'album est écrit à part : si les règles Firestore
+  // ne l'autorisent pas encore, les photos sont ajoutées quand même et l'album sera retenté.
+  let version = VERSION_MAJ;
+  if ((db.contenu.liens.majContenu || 0) < 3) {
+    const tmp = []; ajouterAlbumsOrigine(tmp);
+    const opsAlbums = tmp.filter(o => o.col === 'albums');
+    ops.push(...tmp.filter(o => o.col !== 'albums'));
+    if (opsAlbums.length) { try { await lot(opsAlbums); } catch (e) { console.warn('Album non créé (règles Firestore ?)', e); version = 2; } }
+  }
+  if (t && t.photo_themes_eyebrow !== undefined && t.photo_raccourcis_eyebrow === undefined) ops.push({ type: 'merge', col: 'contenu', id: 'textes', data: { photo_raccourcis_eyebrow: 'Albums' } });
   const unsplash = v => /images\.unsplash\.com/.test(v || '');
   for (const [id, p] of Object.entries(db.photos)) if (unsplash(p.apercu) && p.visible !== false) ops.push({ type: 'merge', col: 'photos', id, data: { visible: false } });
   const jeux = CATEGORIES_ORIGINE.find(c => c.id === 'jeux');

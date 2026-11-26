@@ -1,8 +1,8 @@
 // Écrans de l'espace de gestion KMAUGER.
-import * as S from './store.js?v=202611252109';
-import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611252109';
-import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611252109';
-import { SITE_URL } from '../firebase-config.js?v=202611252109';
+import * as S from './store.js?v=202611260822';
+import { $, $$, esc, ic, toast, ouvrirFenetre, fermerFenetre, confirmer, champ, lireFormulaire, preparerPhoto, preparerImage, telecharger, isoJour } from './ui.js?v=202611260822';
+import { PAGES_TEXTES, TEXTES_ORIGINE, CHAMPS_LIENS, IMAGES_SITE, STATUTS_LIVRE, STATUTS_PROJET, CATEGORIES_PHOTO } from './donnees.js?v=202611260822';
+import { SITE_URL } from '../firebase-config.js?v=202611260822';
 
 const erreur = e => { console.error(e); toast(S.messageErreur(e), 'erreur'); };
 const okEnregistre = r => toast(r === 'attente' ? 'Enregistré sur l\'appareil, envoi dès que la connexion revient.' : 'Enregistré');
@@ -145,26 +145,59 @@ export const VUES = {
 
   // -------------------------------------------------------------- Photographie
   photos: {
-    titre: 'Photographie', icone: 'photos',
+    titre: 'Photos', icone: 'photos',
     filtre: 'tout',
     rendre(el) {
-      const toutes = S.liste('photos');
-      const l = this.filtre === 'tout' ? toutes : toutes.filter(p => p.categorie === this.filtre);
+      const toutes = S.liste('photos'), albums = S.liste('albums');
+      const dans = (p, f) => f === 'tout' || (f === 'sans' ? !p.album || !albums.some(a => a.id === p.album) : p.album === f);
+      if (!['tout', 'sans'].includes(this.filtre) && !albums.some(a => a.id === this.filtre)) this.filtre = 'tout';
+      const l = toutes.filter(p => dans(p, this.filtre));
+      const nomAlbum = id => albums.find(a => a.id === id)?.titre || '';
+      const filtres = [['tout', 'Toutes'], ...albums.map(a => [a.id, a.titre]), ['sans', 'Hors album']];
       el.innerHTML = `
         <div class="barre">
-          <div class="filtres">${[['tout', 'Toutes'], ...Object.entries(CATEGORIES_PHOTO)].map(([k, v]) => `<button class="${k === this.filtre ? 'on' : ''}" data-f="${k}">${esc(v)} <span>${k === 'tout' ? toutes.length : toutes.filter(p => p.categorie === k).length}</span></button>`).join('')}</div>
+          <div class="filtres">${filtres.map(([k, v]) => `<button class="${k === this.filtre ? 'on' : ''}" data-f="${esc(k)}">${esc(v)} <span>${toutes.filter(p => dans(p, k)).length}</span></button>`).join('')}</div>
           <label class="btn btn-primaire">${ic('televerser')} Ajouter des photos<input type="file" id="fichiers" accept="image/*" multiple hidden></label>
         </div>
-        <p class="intro">Les photos sont réduites automatiquement avant l'envoi. L'ordre ici est celui de la galerie du site ; les filtres du site n'affichent que les catégories utilisées.</p>
+        <p class="intro">Les photos d'un album forment son portfolio sur le site (page Photographie → l'album). Les photos « hors album » s'affichent dans la galerie de la page Photographie. Les photos sont réduites automatiquement avant l'envoi.</p>
         ${l.length ? `<div class="galerie">${l.map((p, i) => `
           <figure class="photo ${p.visible === false ? 'masque' : ''}">
             <div class="photo-img"><img src="${esc(p.apercu)}" alt="${esc(p.legende)}" loading="lazy">${p.visible === false ? '<span class="pastille grise">Masquée</span>' : ''}</div>
-            <figcaption><b>${esc(p.legende || 'Sans légende')}</b><small class="type">${esc(CATEGORIES_PHOTO[p.categorie] || '')}</small></figcaption>
-            ${actions(p, i, l.length, this.filtre === 'tout')}
-          </figure>`).join('')}</div>` : vide('Aucune photo', 'Ajoutez vos photos : elles apparaîtront dans la galerie de la page Photographie.')}`;
+            <figcaption><b>${esc(p.legende || 'Sans légende')}</b><small class="type">${esc(nomAlbum(p.album) || 'Hors album')} · ${esc(CATEGORIES_PHOTO[p.categorie] || '')}</small></figcaption>
+            ${actions(p, i, l.length, this.filtre !== 'tout')}
+          </figure>`).join('')}</div>` : vide('Aucune photo ici', 'Ajoutez des photos : choisissez l’album au moment de l’envoi.')}`;
       $$('[data-f]', el).forEach(b => b.onclick = () => { this.filtre = b.dataset.f; this.rendre(el); });
-      $('#fichiers', el).onchange = e => { const f = [...e.target.files]; e.target.value = ''; if (f.length) formTeleversement(f, this.filtre === 'tout' ? 'paysages' : this.filtre); };
+      $('#fichiers', el).onchange = e => { const f = [...e.target.files]; e.target.value = ''; if (f.length) formTeleversement(f, 'portraits', ['tout', 'sans'].includes(this.filtre) ? '' : this.filtre); };
       brancherListe(el, 'photos', { formulaire: formPhoto, nom: p => p.legende || 'sans légende', supprimer: id => S.supprimerPhoto(id) });
+      // Ordre : réglé à l'intérieur d'un album (ou des photos hors album)
+      $$('[data-haut]', el).forEach(b => b.onclick = () => deplacerPhoto(b.dataset.haut, -1, l));
+      $$('[data-bas]', el).forEach(b => b.onclick = () => deplacerPhoto(b.dataset.bas, 1, l));
+    }
+  },
+
+  // -------------------------------------------------------------- Albums photo
+  albums: {
+    titre: 'Albums photo', icone: 'photos',
+    rendre(el) {
+      const l = S.liste('albums'), photos = S.liste('photos');
+      const couv = a => a.couverture || photos.find(p => p.album === a.id)?.apercu || '';
+      el.innerHTML = `
+        ${S.albumsBloques ? `<div class="alerte">Les albums ne sont pas encore autorisés dans la base : publiez les règles Firestore (fichier firestore.rules du dépôt, Firebase → Firestore Database → Règles → Publier). En attendant, le site affiche l'album ST-Line d'origine.</div>` : ''}
+        <div class="barre"><p class="intro">Un album = un portfolio sur le site, avec sa propre page (couverture plein écran, description, photos). Un clic sur « Photos » ouvre les photos de l'album.</p><button class="btn btn-primaire" id="ajout">${ic('plus')} Nouvel album</button></div>
+        ${l.length ? `<div class="galerie">${l.map((x, i) => `
+          <figure class="photo ${x.visible === false ? 'masque' : ''}">
+            <div class="photo-img">${couv(x) ? `<img src="${esc(couv(x))}" alt="" loading="lazy">` : `<div class="vide-img">${esc(x.titre)}</div>`}${etiquetteMasque(x)}</div>
+            <figcaption><b>${esc(x.titre)}</b><small class="type">${photos.filter(p => p.album === x.id).length} photo(s)${x.date ? ' · ' + esc(x.date) : ''} · <a href="#photos" data-voir="${esc(x.id)}">Photos →</a></small></figcaption>
+            ${actions(x, i, l.length)}
+          </figure>`).join('')}</div>` : vide('Aucun album', 'Créez un album (une séance, un lieu, un thème), puis ajoutez-y des photos.')}`;
+      $('#ajout', el).onclick = () => formAlbum();
+      $$('[data-voir]', el).forEach(a => a.onclick = () => { VUES.photos.filtre = a.dataset.voir; });
+      brancherListe(el, 'albums', { formulaire: formAlbum, nom: x => x.titre,
+        supprimer: async id => {
+          const n = photos.filter(p => p.album === id).length;
+          if (n) throw Object.assign(new Error(`Cet album contient ${n} photo(s) : déplacez-les (album « Hors album ») ou supprimez-les d'abord.`), { code: 'categorie-non-vide' });
+          return S.supprimer('albums', id);
+        } });
     }
   },
 
@@ -192,9 +225,9 @@ export const VUES = {
       $$('[data-f]', el).forEach(b => b.onclick = () => { this.filtre = b.dataset.f; this.rendre(el); });
       $('#ajout', el).onclick = () => formRealisation(null, this.filtre === 'tout' ? cats[0]?.id : this.filtre);
       // L'ordre se règle à l'intérieur d'une catégorie
+      brancherListe(el, 'realisations', { formulaire: formRealisation, nom: x => x.titre });
       $$('[data-haut]', el).forEach(b => b.onclick = () => deplacerDans(b.dataset.haut, -1, this.filtre));
       $$('[data-bas]', el).forEach(b => b.onclick = () => deplacerDans(b.dataset.bas, 1, this.filtre));
-      brancherListe(el, 'realisations', { formulaire: formRealisation, nom: x => x.titre });
     }
   },
 
@@ -567,6 +600,38 @@ function formCategorie(c = null) {
   });
 }
 
+function formAlbum(a = null) {
+  formulaireAvecImage({
+    id: 'fal', col: 'albums', element: a, titre: a ? 'Modifier l’album' : 'Nouvel album',
+    defaut: { titre: '', sousTitre: '', description: '', date: '', lieu: '', modele: '', lienModele: '', couverture: '', visible: true },
+    image: { cle: 'couverture', label: 'Photo de couverture (vide = première photo de l’album)', largeur: 2000, plafond: 420000 },
+    corps: v => `
+      ${champ({ cle: 'titre', label: 'Titre de l’album', valeur: v.titre, requis: true, placeholder: 'Ex. : ST-Line' })}
+      ${champ({ cle: 'sousTitre', label: 'Sous-titre', valeur: v.sousTitre, placeholder: 'Une phrase sous le titre' })}
+      ${champ({ cle: 'description', label: 'Description', type: 'texte', valeur: v.description, aide: 'L’histoire de la série. Une ligne vide = nouveau paragraphe.' })}
+      <div class="grille-champs">
+        ${champ({ cle: 'date', label: 'Date', valeur: v.date, placeholder: 'Ex. : Automne 2026' })}
+        ${champ({ cle: 'lieu', label: 'Lieu', valeur: v.lieu })}
+      </div>
+      <div class="grille-champs">
+        ${champ({ cle: 'modele', label: 'Modèle / crédits', valeur: v.modele, placeholder: 'Prénom du modèle, collaboration…' })}
+        ${champ({ cle: 'lienModele', label: 'Lien vers ses réseaux', valeur: v.lienModele, placeholder: 'https://www.instagram.com/…' })}
+      </div>
+      ${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: v.visible !== false })}`,
+    valider: d => !d.titre ? 'Le titre est obligatoire' : !lienValide(d.lienModele) ? 'Le lien du modèle doit commencer par https://' : '',
+  });
+}
+
+// Déplace une photo parmi celles affichées (même album)
+async function deplacerPhoto(id, sens, l) {
+  l = [...l];
+  const i = l.findIndex(x => x.id === id), j = i + sens;
+  if (i < 0 || j < 0 || j >= l.length) return;
+  [l[i], l[j]] = [l[j], l[i]];
+  const ordres = l.map(x => x.ordre || 0).sort((a, b) => a - b);
+  await S.lot(l.map((x, k) => ({ type: 'merge', col: 'photos', id: x.id, data: { ordre: ordres[k] + (ordres[k] === ordres[k - 1] ? k * 0.001 : 0) } }))).catch(erreur);
+}
+
 // Déplace un projet parmi ceux de la même catégorie
 async function deplacerDans(id, sens, cat) {
   const l = S.liste('realisations').filter(r => r.categorie === cat);
@@ -658,15 +723,21 @@ function formCosplay(c = null) {
   });
 }
 
+const optionsAlbums = () => ({ '': 'Hors album (galerie)',
+  // albums référencés par des photos mais pas (encore) lisibles : gardés pour ne pas les perdre
+  ...Object.fromEntries(S.liste('photos').filter(p => p.album).map(p => [p.album, p.album])),
+  ...Object.fromEntries(S.liste('albums').map(a => [a.id, a.titre])) });
+
 function formPhoto(p) {
   ouvrirFenetre({
     titre: 'Modifier la photo',
     contenu: `<form id="fp"><img class="photo-grande" src="${esc(p.apercu)}" alt="">
       ${champ({ cle: 'legende', label: 'Légende', valeur: p.legende })}
       <div class="grille-champs">
+        ${champ({ cle: 'album', label: 'Album', type: 'select', valeur: p.album || '', options: optionsAlbums() })}
         ${champ({ cle: 'categorie', label: 'Catégorie', type: 'select', valeur: p.categorie, options: CATEGORIES_PHOTO })}
-        <div class="champ champ-case">${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: p.visible !== false })}</div>
-      </div></form>`,
+      </div>
+      <div class="champ champ-case">${champ({ cle: 'visible', label: 'Afficher sur le site', type: 'case', valeur: p.visible !== false })}</div></form>`,
     pied: piedForm('fp'),
     onOuvert(corps, pied) {
       $('[data-annuler]', pied).onclick = fermerFenetre;
@@ -678,7 +749,7 @@ function formPhoto(p) {
   });
 }
 
-function formTeleversement(fichiers, categorieDefaut) {
+function formTeleversement(fichiers, categorieDefaut, albumDefaut = '') {
   const nom = f => f.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').replace(/^(img|dsc|pxl|imgp|photo)\s*\d*/i, '').trim();
   let enCours = false;
   const envoyes = new Set();
@@ -687,9 +758,10 @@ function formTeleversement(fichiers, categorieDefaut) {
     large: true,
     contenu: `<form id="ft">
       <div class="grille-champs">
+        ${champ({ cle: 'album', label: 'Album', type: 'select', valeur: albumDefaut, options: optionsAlbums() })}
         ${champ({ cle: 'categorie', label: 'Catégorie', type: 'select', valeur: categorieDefaut, options: CATEGORIES_PHOTO })}
-        <div class="champ champ-case">${champ({ cle: 'visible', label: 'Afficher tout de suite sur le site', type: 'case', valeur: true })}</div>
       </div>
+      <div class="champ champ-case">${champ({ cle: 'visible', label: 'Afficher tout de suite sur le site', type: 'case', valeur: true })}</div>
       <ul class="televersement">${fichiers.map((f, i) => `<li><img data-i="${i}" alt=""><input name="leg${i}" value="${esc(nom(f))}" placeholder="Légende de la photo"><span class="etat-envoi" data-etat="${i}"></span></li>`).join('')}</ul>
     </form>`,
     pied: `<button type="button" class="btn btn-clair" data-annuler>Annuler</button><button type="submit" form="ft" class="btn btn-primaire" id="envoyer">${ic('televerser')} Envoyer</button>`,
@@ -700,7 +772,7 @@ function formTeleversement(fichiers, categorieDefaut) {
         ev.preventDefault();
         if (enCours) return;
         enCours = true; $('#envoyer', pied).disabled = true;
-        const f = ev.target, categorie = f.categorie.value, visible = f.visible.checked;
+        const f = ev.target, categorie = f.categorie.value, album = f.album.value, visible = f.visible.checked;
         let ordre = prochainOrdre('photos'), ok = 0;
         for (let i = 0; i < fichiers.length; i++) {
           if (envoyes.has(i)) continue;
@@ -708,7 +780,7 @@ function formTeleversement(fichiers, categorieDefaut) {
           etat.textContent = 'Envoi…'; etat.className = 'etat-envoi';
           try {
             const { apercu, hd } = await preparerPhoto(fichiers[i]);
-            await S.ajouterPhoto({ legende: f['leg' + i].value.trim(), categorie, visible, ordre: ordre++, ajouteLe: Date.now() }, apercu, hd);
+            await S.ajouterPhoto({ legende: f['leg' + i].value.trim(), categorie, album, visible, ordre: ordre++, ajouteLe: Date.now() }, apercu, hd);
             etat.textContent = 'Envoyée'; etat.classList.add('ok'); ok++; envoyes.add(i);
           } catch (err) {
             console.error(err); etat.textContent = S.messageErreur(err); etat.classList.add('ko');

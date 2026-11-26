@@ -29,7 +29,11 @@ service cloud.firestore {
       allow write: if estGestionnaire();
     }
 
-    // Livres, photos, catégories de projets, projets, cosplays : le site ne lit que ce qui est visible
+    // Livres, albums, photos, catégories de projets, projets, cosplays : le site ne lit que ce qui est visible
+    match /albums/{id} {
+      allow read: if resource.data.visible == true || estGestionnaire();
+      allow write: if estGestionnaire();
+    }
     match /livres/{id} {
       allow read: if resource.data.visible == true || estGestionnaire();
       allow write: if estGestionnaire();

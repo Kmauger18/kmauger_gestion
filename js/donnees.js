@@ -204,7 +204,7 @@ export const IMAGES_SITE = [
   { cle: 'carte_projets', label: 'Carte « Projets »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/carte-projets.jpg' },
   { cle: 'carte_cosplay', label: 'Carte « Cosplay »', page: 'Accueil', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/carte-cosplay.webp' },
   { cle: 'livres_banniere', label: 'Bannière', page: 'Livres', origine: 'https://kmauger18.github.io/kmauger/assets/img/livres/banniere-livres.jpg' },
-  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: 'https://kmauger18.github.io/kmauger/assets/img/photos/st-line/02.webp' },
+  { cle: 'photo_banniere', label: 'Bannière', page: 'Photographie', origine: 'https://kmauger18.github.io/kmauger/assets/img/photos/banniere-photographie.webp' },
   { cle: 'projets_banniere', label: 'Bannière', page: 'Projets', origine: 'https://kmauger18.github.io/kmauger/assets/img/projets/banniere-projets.jpg' },
   { cle: 'cosplay_banniere', label: 'Bannière', page: 'Cosplay', origine: 'https://kmauger18.github.io/kmauger/assets/img/deco/banniere-cosplay.webp' },
   { cle: 'apropos_portrait', label: 'Portrait (à la place du logo)', page: 'À propos', origine: 'img/logo.png' },
